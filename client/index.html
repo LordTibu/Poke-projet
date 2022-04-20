@@ -1,0 +1,223 @@
+<html>
+  <head>
+    <title>Pokemon companion</title>
+    <link rel="stylesheet" href="bulma.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.1.1/css/all.css"
+    />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  </head>
+  <body>
+    <div id="root">
+      <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar">
+          <div class="navbar-item">
+            <div class="buttons">
+              <a id="btn-pokedex" class="button is-light"> Pokedex </a>
+              <a id="btn-combat" class="button is-light"> Combat </a>
+            </div>
+          </div>
+        </div>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons">
+              <a id="btn-open-login-modal" class="button is-light">
+                Connexion
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <!-- le HTML ci-dessous est fourni à titre d'exemple mais devra être
+    supprimé de l'application finale. Bien penser à garder la balise script et
+    les balises fermantes après cette balise script. -->
+    <h1>Page exemple</h1>
+    À supprimer pour la version finale
+    <section class="section">
+      <div class="columns">
+        <div class="column">
+          <div class="tabs is-centered">
+            <ul>
+              <li class="is-active" id="tab-all-pokemons">
+                <a>Tous les pokemons</a>
+              </li>
+              <li id="tab-tout"><a>Mes pokemons</a></li>
+            </ul>
+          </div>
+          <div id="tbl-pokemons">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th><span>Image</span></th>
+                  <th>
+                    <span>#</span
+                    ><span class="icon"><i class="fas fa-angle-up"></i></span>
+                  </th>
+                  <th><span>Name</span></th>
+                  <th><span>Abilities</span></th>
+                  <th><span>Types</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="is-selected">
+                  <td>
+                    <img
+                      alt="Bulbasaur"
+                      src="https://assets.pokemon.com/assets/cms2/img/pokedex/detail/001.png"
+                      width="64"
+                    />
+                  </td>
+                  <td><div class="content">1</div></td>
+                  <td><div class="content">Bulbasaur</div></td>
+                  <td>
+                    <ul>
+                      <li>Overgrow</li>
+                      <li>Chlorophyll</li>
+                    </ul>
+                  </td>
+                  <td>
+                    <ul>
+                      <li>grass</li>
+                      <li>poison</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr class="">
+                  <td>
+                    <img
+                      alt="Ivysaur"
+                      src="https://assets.pokemon.com/assets/cms2/img/pokedex/detail/002.png"
+                      width="64"
+                    />
+                  </td>
+                  <td><div class="content">2</div></td>
+                  <td><div class="content">Ivysaur</div></td>
+                  <td>
+                    <ul>
+                      <li>Overgrow</li>
+                      <li>Chlorophyll</li>
+                    </ul>
+                  </td>
+                  <td>
+                    <ul>
+                      <li>grass</li>
+                      <li>poison</li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr class="">
+                  <td>
+                    <img
+                      alt="Charizard"
+                      src="https://assets.pokemon.com/assets/cms2/img/pokedex/detail/006.png"
+                      width="64"
+                    />
+                  </td>
+                  <td><div class="content">6</div></td>
+                  <td><div class="content">Charizard</div></td>
+                  <td>
+                    <ul>
+                      <li>Blaze</li>
+                      <li>Solar Power</li>
+                    </ul>
+                  </td>
+                  <td>
+                    <ul>
+                      <li>fire</li>
+                      <li>flying</li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="column">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-header-title">Fushigidaneフシギダネ (#1)</div>
+            </div>
+            <div class="card-content">
+              <article class="media">
+                <div class="media-content">
+                  <h1 class="title">Bulbasaur</h1>
+                </div>
+              </article>
+            </div>
+            <div class="card-content">
+              <article class="media">
+                <div class="media-content">
+                  <div class="content has-text-left">
+                    <p>Hit points: 45</p>
+                    <h3>Abilities</h3>
+                    <ul>
+                      <li>Overgrow</li>
+                      <li>Chlorophyll</li>
+                    </ul>
+                    <h3>Resistant against</h3>
+                    <ul>
+                      <li>Electric</li>
+                      <li>Fairy</li>
+                      <li>Fight</li>
+                      <li>Grass</li>
+                      <li>Water</li>
+                    </ul>
+                    <h3>Weak against</h3>
+                    <ul>
+                      <li>Fire</li>
+                      <li>Flying</li>
+                      <li>Ice</li>
+                      <li>Psychic</li>
+                    </ul>
+                  </div>
+                </div>
+                <figure class="media-right">
+                  <figure class="image is-475x475">
+                    <img
+                      class=""
+                      src="https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png"
+                      alt="Bulbasaur"
+                    />
+                  </figure>
+                </figure>
+              </article>
+            </div>
+            <div class="card-footer">
+              <article class="media">
+                <div class="media-content">
+                  <button class="is-success button" tabindex="0">
+                    Ajouter à mon deck
+                  </button>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div id="mdl-login" class="modal is-inactive">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Utilisateur</p>
+          <button
+            id="btn-close-login-modal1"
+            class="delete"
+            aria-label="close"
+          ></button>
+        </header>
+        <section class="modal-card-body">
+          <p id="elt-affichage-login">
+            Ici, il faudrait afficher le login de l'utilisateur.
+          </p>
+        </section>
+        <footer class="modal-card-foot" style="justify-content: flex-end">
+          <button id="btn-close-login-modal2" class="button">Fermer</button>
+        </footer>
+      </div>
+    </div>
+    <script src="client.js"></script>
+  </body>
+</html>
