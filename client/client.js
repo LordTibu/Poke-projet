@@ -1,14 +1,13 @@
 /* ******************************************************************
  * Constantes de configuration
  * ****************************************************************** */
-const apiKey = "bafae61a-54b5-4977-94d4-d8159bec8262"; //"69617e9b-19db-4bf7-a33f-18d4e90ccab7";
-const serverUrl = "https://lifap5.univ-lyon1.fr/";
+const apiKey = "bafae61a-54b5-4977-94d4-d8159bec8262";
+const serverUrl = "https://lifap5.univ-lyon1.fr";
 
 /* ******************************************************************
  * Gestion de la boîte de dialogue (a.k.a. modal) d'affichage de
  * l'utilisateur.
  * ****************************************************************** */
-
 /**
  * Fait une requête GET authentifiée sur /whoami
  * @returns une promesse du login utilisateur ou du message d'erreur
