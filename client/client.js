@@ -3,6 +3,7 @@
  * ****************************************************************** */
 //const apiKey = "bafae61a-54b5-4977-94d4-d8159bec8262";
 const serverUrl = "https://lifap5.univ-lyon1.fr";
+//const allPokemon = fetch(serverUrl + "/pokemon").then((response) => {return response.json()});
 
 /* ******************************************************************
  * Gestion de la boîte de dialogue (a.k.a. modal) d'affichage de
@@ -25,6 +26,45 @@ function fetchWhoami(keyapi) {
       }
     })
     .catch((erreur) => ({ err: erreur }));
+}
+
+// Get all pokemons from server
+function fetchPokemon() {
+  return fetch(serverUrl + "/pokemon").then((response) => {return response.json()});
+}
+
+// Funcion ejemplo de como iterar a traves del tab de pokemones
+function iterateAllPokemon(){
+  fetchPokemon().then((pokeArray) => {
+    pokeArray.forEach(pokemon => {console.log(pokemon.PokedexNumber);})
+  })
+}
+
+// Genera la entrada de un pokemon en la lista de la izquierda
+function generePokemon(pokemon){
+  const html = `
+  <tr class="">
+  <td>
+    <img
+      alt="${pokemon.Name}"
+      src="${pokemon.Images.Detail}"
+      width="64"
+    />
+  </td>
+  <td><div class="content">${pokemon.PokedexNumber}</div></td>
+  <td><div class="content">${pokemon.Name}</div></td>
+  <td>
+    <ul>
+      <li>${pokemon.Abilities[0]}</li>
+      <li>${pokemon.Abilities[1]}</li>
+    </ul>
+  </td>
+  <td>
+    <ul>
+      <li>${pokemon.Types[0]}</li>
+      <li>${pokemon.Types[1]}</li>
+    </ul>
+  </td>`
 }
 
 /**
@@ -334,5 +374,6 @@ function initClientPokemons() {
 // Appel de la fonction init_client_duels au après chargement de la page
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Exécution du code après chargement de la page");
+  iterateAllPokemon();
   initClientPokemons();
 });
