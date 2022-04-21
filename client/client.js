@@ -1,7 +1,7 @@
 /* ******************************************************************
  * Constantes de configuration
  * ****************************************************************** */
-const apiKey = "bafae61a-54b5-4977-94d4-d8159bec8262";
+//const apiKey = "bafae61a-54b5-4977-94d4-d8159bec8262";
 const serverUrl = "https://lifap5.univ-lyon1.fr";
 
 /* ******************************************************************
@@ -12,8 +12,8 @@ const serverUrl = "https://lifap5.univ-lyon1.fr";
  * Fait une requête GET authentifiée sur /whoami
  * @returns une promesse du login utilisateur ou du message d'erreur
  */
-function fetchWhoami() {
-  return fetch(serverUrl + "/whoami", { headers: { "Api-Key": apiKey } })
+function fetchWhoami(keyapi) {
+  return fetch(serverUrl + "/whoami", { headers: { "Api-Key": keyapi } })
     .then((response) => {
       if (response.status === 401) {
         return response.json().then((json) => {
@@ -34,8 +34,8 @@ function fetchWhoami() {
  * @param {Etat} etatCourant l'état courant
  * @returns Une promesse de mise à jour
  */
-function lanceWhoamiEtInsereLogin(etatCourant) {
-  return fetchWhoami().then((data) => {
+function lanceWhoamiEtInsereLogin(etatCourant,keyapi) {
+  return fetchWhoami(keyapi).then((data) => {
     majEtatEtPage(etatCourant, {
       login: data.user, // qui vaut undefined en cas d'erreur
       errLogin: data.err, // qui vaut undefined si tout va bien
@@ -151,8 +151,8 @@ function genereModaleLogin(etatCourant) {
  * modale de login soit affichée
  * @param {Etat} etatCourant
  */
-function afficheModaleConnexion(etatCourant) {
-  lanceWhoamiEtInsereLogin(etatCourant);
+function afficheModaleConnexion(etatCourant,keyapi) {
+  lanceWhoamiEtInsereLogin(etatCourant,keyapi);
 }
 
 /**
@@ -168,17 +168,37 @@ function genereBoutonConnexion(etatCourant) {
     <div class="navbar-item">
       <div class="buttons">
         <a id="btn-open-login-modal" class="button is-light"> Connexion </a>
+        <label for="keyapi">Api-Key:</label>
+        <input type="password" id="keyapi" name="keyapi"><br><br>
       </div>
     </div>
   </div>`;
-  return {
+  const html2 = `
+  <div class="navbar-end">
+    <div class="navbar-item">
+      <div class="buttons">
+        <a id="btn-open-login-modal" class="button is-light"> Deconnexion </a>
+      </div>
+    </div>
+  </div>`;
+  if(etatCourant.errLogin === undefined){
+    return {
     html: html,
     callbacks: {
       "btn-open-login-modal": {
-        onclick: () => afficheModaleConnexion(etatCourant),
+        onclick: () => afficheModaleConnexion(etatCourant,document.getElementById("keyapi").value),
       },
     },
   };
+  } else {
+    return {html: html2,
+      callbacks: {
+        "btn-open-login-modal": {
+          onclick: () => afficheModaleConnexion(etatCourant,document.getElementById("keyapi").value),
+        },
+      },
+    };
+  }
 }
 
 /**
