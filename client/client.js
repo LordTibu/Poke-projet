@@ -65,6 +65,20 @@ function generePokemon(pokemon){
       <li>${pokemon.Types[1]}</li>
     </ul>
   </td>`
+  return html;
+}
+
+function genereListePokemon(){
+  /*const html = [``];
+  html.forEach(d => {d.append(
+    fetchPokemon().then((pokeArray) => {
+      pokeArray.forEach(pokemon => {generePokemon(pokemon);})
+    }))
+  })
+  return html;*/
+  return fetchPokemon().then(pokeArray => {
+    return generePokemon(pokeArray[0]);
+  })
 }
 
 /**
@@ -278,6 +292,8 @@ function genereBarreNavigation(etatCourant) {
 function generePage(etatCourant) {
   const barredeNavigation = genereBarreNavigation(etatCourant);
   const modaleLogin = genereModaleLogin(etatCourant);
+  const listePokemon = genereListePokemon();
+  console.log(listePokemon);
   // remarquer l'usage de la notation ... ci-dessous qui permet de "fusionner"
   // les dictionnaires de callbacks qui viennent de la barre et de la modale.
   // Attention, les callbacks définis dans modaleLogin.callbacks vont écraser
@@ -286,7 +302,7 @@ function generePage(etatCourant) {
   // modaleLogin portent sur des zone différentes de la page et n'ont pas
   // d'éléments en commun.
   return {
-    html: barredeNavigation.html + modaleLogin.html,
+    html: barredeNavigation.html + listePokemon + modaleLogin.html,
     callbacks: { ...barredeNavigation.callbacks, ...modaleLogin.callbacks },
   };
 }
@@ -374,6 +390,6 @@ function initClientPokemons() {
 // Appel de la fonction init_client_duels au après chargement de la page
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Exécution du code après chargement de la page");
-  iterateAllPokemon();
+  //iterateAllPokemon();
   initClientPokemons();
 });
