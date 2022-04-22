@@ -42,7 +42,7 @@ function iterateAllPokemon(){
 
 // Genera la entrada de un pokemon en la lista de la izquierda
 function generePokemon(pokemon){
-  const html = `
+  return `
   <tr class="">
   <td>
     <img
@@ -65,20 +65,14 @@ function generePokemon(pokemon){
       <li>${pokemon.Types[1]}</li>
     </ul>
   </td>`
-  return html;
 }
 
-function genereListePokemon(){
-  /*const html = [``];
-  html.forEach(d => {d.append(
-    fetchPokemon().then((pokeArray) => {
-      pokeArray.forEach(pokemon => {generePokemon(pokemon);})
-    }))
-  })
-  return html;*/
+function genereListePokemon(etatCourant){
   return fetchPokemon().then(pokeArray => {
-    return generePokemon(pokeArray[0]);
-  })
+    const htmlArray = pokeArray.map(pokemon => generePokemon(pokemon))
+    console.log(htmlArray[0]);
+    majPage(etatCourant, htmlArray.join("\n"));
+  });
 }
 
 /**
@@ -292,8 +286,6 @@ function genereBarreNavigation(etatCourant) {
 function generePage(etatCourant) {
   const barredeNavigation = genereBarreNavigation(etatCourant);
   const modaleLogin = genereModaleLogin(etatCourant);
-  const listePokemon = genereListePokemon();
-  console.log(listePokemon);
   // remarquer l'usage de la notation ... ci-dessous qui permet de "fusionner"
   // les dictionnaires de callbacks qui viennent de la barre et de la modale.
   // Attention, les callbacks définis dans modaleLogin.callbacks vont écraser
@@ -302,7 +294,7 @@ function generePage(etatCourant) {
   // modaleLogin portent sur des zone différentes de la page et n'ont pas
   // d'éléments en commun.
   return {
-    html: barredeNavigation.html + listePokemon + modaleLogin.html,
+    html: barredeNavigation.html + modaleLogin.html,
     callbacks: { ...barredeNavigation.callbacks, ...modaleLogin.callbacks },
   };
 }
@@ -365,10 +357,10 @@ function enregistreCallbacks(callbacks) {
  *
  * @param {Etat} etatCourant l'état courant
  */
-function majPage(etatCourant) {
+function majPage(etatCourant, listePokemon = "") {
   console.log("CALL majPage");
   const page = generePage(etatCourant);
-  document.getElementById("root").innerHTML = page.html;
+  document.getElementById("root").innerHTML = page.html + listePokemon;
   enregistreCallbacks(page.callbacks);
 }
 
@@ -384,7 +376,7 @@ function initClientPokemons() {
     login: undefined,
     errLogin: undefined,
   };
-  majPage(etatInitial);
+  genereListePokemon(etatInitial);
 }
 
 // Appel de la fonction init_client_duels au après chargement de la page
