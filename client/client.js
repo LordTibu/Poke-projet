@@ -61,18 +61,13 @@ function generePokemonCallbacks(pokemon){
 }
 
 function generePokeAbilities(pokemon){
-  return `
-  <td>
-  <ul>
-    <li>${pokemon.Abilities[0]}</li>
-    <li>${pokemon.Abilities[1]}</li>
-  </ul>
-  </td>`
+  const t = pokemon.Abilities.map(type => `<li>${type}</li>`);
+  return `<td><ul>` + t.join("\n") +`</ul></td></tr>`;
 }
 
 function generePokeTypes(pokemon){
   const t = pokemon.Types.map(type => `<li>${type}</li>`);
-  return `<td><ul>` + t.join("\n") +`</ul></td></tr>`
+  return `<td><ul>` + t.join("\n") +`</ul></td></tr>`;
 }
 
 // Genera la entrada de un pokemon en la lista de la izquierda
