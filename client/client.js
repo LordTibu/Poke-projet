@@ -40,8 +40,7 @@ function iterateAllPokemon(){
   })
 }
 
-// Genera la entrada de un pokemon en la lista de la izquierda
-function generePokemon(pokemon){
+function generePokeName(pokemon){
   return `
   <tr class="">
   <td>
@@ -52,19 +51,35 @@ function generePokemon(pokemon){
     />
   </td>
   <td><div class="content">${pokemon.PokedexNumber}</div></td>
-  <td><div class="content">${pokemon.Name}</div></td>
+  <td><div class="content">${pokemon.Name}</div></td>`
+}
+
+function generePokeAbilities(pokemon){
+  return `
   <td>
-    <ul>
-      <li>${pokemon.Abilities[0]}</li>
-      <li>${pokemon.Abilities[1]}</li>
-    </ul>
-  </td>
-  <td>
-    <ul>
-      <li>${pokemon.Types[0]}</li>
-      <li>${pokemon.Types[1]}</li>
-    </ul>
+  <ul>
+    <li>${pokemon.Abilities[0]}</li>
+    <li>${pokemon.Abilities[1]}</li>
+  </ul>
   </td>`
+}
+
+function generePokeTypes(pokemon){
+  return `
+  <td>
+  <ul>
+    <li>${pokemon.Types[0]}</li>
+    <li>${pokemon.Types[1]}</li>
+  </ul>
+  </td>`
+}
+
+// Genera la entrada de un pokemon en la lista de la izquierda
+function generePokemon(pokemon){
+  const name = generePokeName(pokemon);
+  const abilt = generePokeAbilities(pokemon);
+  const types = generePokeTypes(pokemon);
+  return name + abilt + types;
 }
 
 function genereListePokemon(etatCourant){
