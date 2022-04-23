@@ -41,17 +41,23 @@ function iterateAllPokemon(){
 }
 
 function generePokeName(pokemon){
-  return `
-  <tr class="">
-  <td>
-    <img
-      alt="${pokemon.Name}"
-      src="${pokemon.Images.Detail}"
-      width="64"
-    />
-  </td>
-  <td><div class="content">${pokemon.PokedexNumber}</div></td>
-  <td><div class="content">${pokemon.Name}</div></td>`
+    return`
+    <tr id="${pokemon.Name}" class="">
+    <td>
+      <img
+        alt="${pokemon.Name}"
+        src="${pokemon.Images.Detail}"
+        width="64"
+      />
+    </td>
+    <td><div class="content">${pokemon.PokedexNumber}</div></td>
+    <td><div class="content">${pokemon.Name}</div></td>`;
+}
+
+function generePokemonCallbacks(pokemon){
+  return {[pokemon.Name] : {onclick : () => {console.log(`Clicked on ${pokemon.Name}`);
+    document.getElementById(pokemon.Name).classList.toggle("is-selected");}
+  }};
 }
 
 function generePokeAbilities(pokemon){
@@ -65,28 +71,50 @@ function generePokeAbilities(pokemon){
 }
 
 function generePokeTypes(pokemon){
-  return `
-  <td>
-  <ul>
-    <li>${pokemon.Types[0]}</li>
-    <li>${pokemon.Types[1]}</li>
-  </ul>
-  </td>`
+  const t = pokemon.Types.map(type => `<li>${type}</li>`);
+  return `<td><ul>` + t.join("\n") +`</ul></td></tr>`
 }
 
 // Genera la entrada de un pokemon en la lista de la izquierda
-function generePokemon(pokemon){
+function generePokemonHTML(pokemon){
   const name = generePokeName(pokemon);
   const abilt = generePokeAbilities(pokemon);
   const types = generePokeTypes(pokemon);
   return name + abilt + types;
 }
 
+function generePokeListeHead(){
+  return `<div id="tbl-pokemons">
+  <table class="table">
+    <thead>
+      <tr>
+        <th><span>Image</span></th>
+        <th>
+          <span>#</span
+          ><span class="icon"><i class="fas fa-angle-up"></i></span>
+        </th>
+        <th><span>Name</span></th>
+        <th><span>Abilities</span></th>
+        <th><span>Types</span></th>
+      </tr>
+    </thead>
+    <tbody>`
+}
+
+function generePokeListeFooter(){
+  return `</tbody>
+  </table>
+  </div>`
+}
+
 function genereListePokemon(etatCourant){
   return fetchPokemon().then(pokeArray => {
-    const htmlArray = pokeArray.map(pokemon => generePokemon(pokemon))
-    console.log(htmlArray[0]);
-    majPage(etatCourant, htmlArray.join("\n"));
+    const htmlArray = pokeArray.map(pokemon => generePokemonHTML(pokemon));
+    const callb = Object.assign({}, ...pokeArray.map(
+      pokemon => generePokemonCallbacks(pokemon)))
+    majPage(etatCourant, {html:generePokeListeHead() + htmlArray.join("\n") +
+    generePokeListeFooter(),
+    callbacks: callb});
   });
 }
 
@@ -375,8 +403,8 @@ function enregistreCallbacks(callbacks) {
 function majPage(etatCourant, listePokemon = "") {
   console.log("CALL majPage");
   const page = generePage(etatCourant);
-  document.getElementById("root").innerHTML = page.html + listePokemon;
-  enregistreCallbacks(page.callbacks);
+  document.getElementById("root").innerHTML = page.html + listePokemon.html;
+  enregistreCallbacks({...page.callbacks, ...listePokemon.callbacks});
 }
 
 /**
