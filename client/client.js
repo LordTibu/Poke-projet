@@ -62,12 +62,27 @@ function generePokemonCallbacks(pokemon){
 
 function generePokeAbilities(pokemon){
   const t = pokemon.Abilities.map(type => `<li>${type}</li>`);
-  return `<td><ul>` + t.join("\n") +`</ul></td></tr>`;
+  return `<td><ul>` + t.join("\n") +`</ul></td>`;
 }
 
 function generePokeTypes(pokemon){
   const t = pokemon.Types.map(type => `<li>${type}</li>`);
-  return `<td><ul>` + t.join("\n") +`</ul></td></tr>`;
+  return `<td><ul>` + t.join("\n") +`</ul></td>`;
+}
+
+function generePokeTypesCard(pokemon){
+  const t = pokemon.Abilities.map(type => `<li>${type}</li>`);
+  return t.join("\n");
+}
+
+function generePokeResistances(pokemon){
+  const against = Object.entries(pokemon.Against);
+  const strong = against.filter(pair => pair[1] < 1).map(pair => `<li>${pair[0]}</li>`).join("\n");
+  const weak = against.filter(pair => pair[1] > 1).map(pair => `<li>${pair[0]}</li>`).join("\n");
+  return {
+    strong : strong,
+    weak : weak
+  }
 }
 
 // Genera la entrada de un pokemon en la lista de la izquierda
@@ -75,7 +90,7 @@ function generePokemonHTML(pokemon){
   const name = generePokeName(pokemon);
   const abilt = generePokeAbilities(pokemon);
   const types = generePokeTypes(pokemon);
-  return name + abilt + types;
+  return name + abilt + types + `</tr>`;
 }
 
 function generePokeListeHead(){
@@ -108,9 +123,84 @@ function genereListePokemon(etatCourant){
     const callb = Object.assign({}, ...pokeArray.map(
       pokemon => generePokemonCallbacks(pokemon)))
     majPage(etatCourant, {html:generePokeListeHead() + htmlArray.join("\n") +
-    generePokeListeFooter(),
+    generePokeListeFooter() + generePokeCard(pokeArray[0]),
     callbacks: callb});
   });
+}
+
+function generePokeCardHead(pokemon){
+  return`
+  <div class="column">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-title">${pokemon.JapaneseName}</div>
+    </div>
+    <div class="card-content">
+      <article class="media">
+        <div class="media-content">
+          <h1 class="title">${pokemon.Name}</h1>
+        </div>
+      </article>
+    </div>
+    <div class="card-content">
+      <article class="media">
+        <div class="media-content">
+          <div class="content has-text-left">
+            <p>Hit points: ${pokemon.Hp}</p>`
+}
+
+function generePokeCardBody(pokemon){
+  const types = generePokeTypesCard(pokemon);
+  const against = generePokeResistances(pokemon);
+  return `
+  <h3>Abilities</h3>
+  <ul>
+   ${types}
+  </ul>
+  <h3>Resistant against</h3>
+  <ul>
+    ${against.strong}
+  </ul>
+  <h3>Weak against</h3>
+  <ul>
+    ${against.weak}
+  </ul>
+</div>
+</div>
+<figure class="media-right">`
+}
+
+function generePokeCardFoot(pokemon){
+  return`
+  <figure class="image is-475x475">
+            <img
+              class=""
+              src="${pokemon.Images.Detail}"
+              alt="${pokemon.Name}"
+            />
+          </figure>
+        </figure>
+      </article>
+    </div>
+    <div class="card-footer">
+      <article class="media">
+        <div class="media-content">
+          <button class="is-success button" tabindex="0">
+            Ajouter à mon deck
+          </button>
+        </div>
+      </article>
+    </div>
+  </div>
+  </div>`
+}
+
+function generePokeCard(pokemon){
+  console.log("se genero carta");
+  const head = generePokeCardHead(pokemon);
+  const body = generePokeCardBody(pokemon);
+  const foot = generePokeCardFoot(pokemon);
+  return head + body + foot;
 }
 
 /**
