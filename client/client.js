@@ -4,6 +4,18 @@
 //const apiKey = "bafae61a-54b5-4977-94d4-d8159bec8262";
 const serverUrl = "https://lifap5.univ-lyon1.fr";
 //const allPokemon = fetch(serverUrl + "/pokemon").then((response) => {return response.json()});
+const bulba = {"Abilities":["Torrent","Rain Dish"],
+"Against":{"Bug":1,"Dark":1,"Dragon":1,"Electric":2,
+"Fairy":1,"Fight":1,"Fire":0.5,"Flying":1,"Ghost":1,
+"Grass":2,"Ground":1,"Ice":0.5,"Normal":1,"Poison":1,
+"Psychic":1,"Rock":1,"Steel":0.5,"Water":0.5},"Attack":103,
+"BaseEggSteps":5120,"BaseHappiness":70,"BaseTotal":630,
+"CaptureRate":45,"Classification":"","Defense":120,
+"ExperienceGrowth":1059860,"Generation":1,"HeightM":1.6,
+"Hp":79,"Images":{"Full":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/009.png",
+"Detail":"https://assets.pokemon.com/assets/cms2/img/pokedex/detail/009.png"},
+"IsLegendary":0,"JapaneseName":"Kamexカメックス","Name":"Blastoise","PercentageMale":88.1,
+"PokedexNumber":9,"SpAttack":135,"SpDefense":115,"Speed":78,"Types":["water"],"WeightKg":85.5}
 
 /* ******************************************************************
  * Gestion de la boîte de dialogue (a.k.a. modal) d'affichage de
@@ -54,9 +66,10 @@ function generePokeName(pokemon){
     <td><div class="content">${pokemon.Name}</div></td>`;
 }
 
-function generePokemonCallbacks(pokemon){
+function generePokemonCallbacks(etatActuel, pokemon){
   return {[pokemon.Name] : {onclick : () => {console.log(`Clicked on ${pokemon.Name}`);
-    document.getElementById(pokemon.Name).classList.toggle("is-selected");}
+    document.getElementById(pokemon.Name).classList.toggle("is-selected");
+    genereListePokemon(etatActuel, pokemon)}
   }};
 }
 
@@ -70,7 +83,7 @@ function generePokeTypes(pokemon){
   return `<td><ul>` + t.join("\n") +`</ul></td>`;
 }
 
-function generePokeTypesCard(pokemon){
+function generePokeAbilitiesCard(pokemon){
   const t = pokemon.Abilities.map(type => `<li>${type}</li>`);
   return t.join("\n");
 }
@@ -94,36 +107,51 @@ function generePokemonHTML(pokemon){
 }
 
 function generePokeListeHead(){
-  return `<div id="tbl-pokemons">
-  <table class="table">
-    <thead>
-      <tr>
-        <th><span>Image</span></th>
-        <th>
-          <span>#</span
-          ><span class="icon"><i class="fas fa-angle-up"></i></span>
-        </th>
-        <th><span>Name</span></th>
-        <th><span>Abilities</span></th>
-        <th><span>Types</span></th>
-      </tr>
-    </thead>
-    <tbody>`
+  return `
+  <section class="section">
+      <div class="columns">
+        <div class="column">
+          <div class="tabs is-centered">
+            <ul>
+              <li class="is-active" id="tab-all-pokemons">
+                <a>Tous les pokemons</a>
+              </li>
+              <li id="tab-tout"><a>Mes pokemons</a></li>
+            </ul>
+          </div>
+          <div id="tbl-pokemons">
+          <table class="table">
+            <thead>
+              <tr>
+                <th><span>Image</span></th>
+                <th>
+                  <span>#</span
+                  ><span class="icon"><i class="fas fa-angle-up"></i></span>
+                </th>
+                <th><span>Name</span></th>
+                <th><span>Abilities</span></th>
+                <th><span>Types</span></th>
+              </tr>
+            </thead>
+            <tbody>`
 }
 
 function generePokeListeFooter(){
   return `</tbody>
   </table>
+  </div>
   </div>`
 }
 
-function genereListePokemon(etatCourant){
+function genereListePokemon(etatCourant, poke = bulba){
   return fetchPokemon().then(pokeArray => {
     const htmlArray = pokeArray.map(pokemon => generePokemonHTML(pokemon));
     const callb = Object.assign({}, ...pokeArray.map(
-      pokemon => generePokemonCallbacks(pokemon)))
+      pokemon => generePokemonCallbacks(etatCourant, pokemon)))
     majPage(etatCourant, {html:generePokeListeHead() + htmlArray.join("\n") +
-    generePokeListeFooter() + generePokeCard(pokeArray[0]),
+    generePokeListeFooter() + generePokeCard(poke) + `</div>
+    </div>
+    </section>`,
     callbacks: callb});
   });
 }
@@ -150,24 +178,24 @@ function generePokeCardHead(pokemon){
 }
 
 function generePokeCardBody(pokemon){
-  const types = generePokeTypesCard(pokemon);
+  const abilt = generePokeAbilitiesCard(pokemon);
   const against = generePokeResistances(pokemon);
   return `
-  <h3>Abilities</h3>
-  <ul>
-   ${types}
-  </ul>
-  <h3>Resistant against</h3>
-  <ul>
-    ${against.strong}
-  </ul>
-  <h3>Weak against</h3>
-  <ul>
-    ${against.weak}
-  </ul>
-</div>
-</div>
-<figure class="media-right">`
+    <h3>Abilities</h3>
+    <ul>
+    ${abilt}
+    </ul>
+    <h3>Resistant against</h3>
+    <ul>
+      ${against.strong}
+    </ul>
+    <h3>Weak against</h3>
+    <ul>
+      ${against.weak}
+    </ul>
+    </div>
+    </div>
+    <figure class="media-right">`
 }
 
 function generePokeCardFoot(pokemon){
