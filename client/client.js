@@ -69,7 +69,8 @@ function generePokeName(pokemon){
 function generePokemonCallbacks(etatActuel, pokemon){
   return {[pokemon.Name] : {onclick : () => {console.log(`Clicked on ${pokemon.Name}`);
     document.getElementById(pokemon.Name).classList.toggle("is-selected");
-    genereListePokemon(etatActuel, pokemon)}
+    document.getElementById("PokeCard").innerHTML = generePokeCard(pokemon);
+    }
   }};
 }
 
@@ -124,16 +125,36 @@ function generePokeListeHead(){
             <thead>
               <tr>
                 <th><span>Image</span></th>
-                <th>
-                  <span>#</span
-                  ><span class="icon"><i class="fas fa-angle-up"></i></span>
+                <th id="pokeListeNumber">
+                  <span>#</span>
+                  <span class="icon"><i class="fas fa-angle-up"></i></span>
                 </th>
-                <th><span>Name</span></th>
-                <th><span>Abilities</span></th>
-                <th><span>Types</span></th>
+                <th id="pokeListeName"><span>Name</span></th>
+                <th id="pokeListeAbilt"><span>Abilities</span></th>
+                <th id="pokeListeTypes"><span>Types</span></th>
               </tr>
             </thead>
-            <tbody>`
+            <tbody id="PokeListe">`
+}
+
+function genereListeCallbacks(etatActuel){
+  return {
+    "pokeListeNumber" : {onclick : () => {console.log(`Clicked on pokeListeNumber`);
+      document.getElementById("pokeListeNumber").insertAdjacentHTML("beforeend",
+      `<span class="icon"><i class="fas fa-angle-up"></i></span>`);}
+    },
+    "pokeListeName" : {onclick : () => {console.log(`Clicked on pokeListeName`);
+      document.getElementById("pokeListeName").insertAdjacentHTML("beforeend",
+     `<span class="icon"><i class="fas fa-angle-up"></i></span>`);}
+    },
+    "pokeListeAbilt" : {onclick : () => {console.log(`Clicked on pokeListeAbilt`);
+      document.getElementById("pokeListeAbilt").insertAdjacentHTML("beforeend",
+     `<span class="icon"><i class="fas fa-angle-up"></i></span>`);}
+    },
+    "pokeListeTypes" : {onclick : () => {console.log(`Clicked on pokeListeTypes`);
+      document.getElementById("pokeListeTypes").insertAdjacentHTML("beforeend",
+     `<span class="icon"><i class="fas fa-angle-up"></i></span>`);}},
+    };
 }
 
 function generePokeListeFooter(){
@@ -145,21 +166,26 @@ function generePokeListeFooter(){
 
 function genereListePokemon(etatCourant, poke = bulba){
   return fetchPokemon().then(pokeArray => {
-    const htmlArray = pokeArray.map(pokemon => generePokemonHTML(pokemon));
+    const htmlArray = pokeArray.sort(pokeNumberCompare).map(pokemon => generePokemonHTML(pokemon));
     const callb = Object.assign({}, ...pokeArray.map(
-      pokemon => generePokemonCallbacks(etatCourant, pokemon)))
+      pokemon => generePokemonCallbacks(etatCourant, pokemon)));
+    const callb2 = genereListeCallbacks(etatCourant);
     majPage(etatCourant, {html:generePokeListeHead() + htmlArray.join("\n") +
     generePokeListeFooter() + generePokeCard(poke) + `</div>
     </div>
     </section>`,
-    callbacks: callb});
+    callbacks: {...callb, ...callb2}});
   });
+}
+
+function pokeNumberCompare(poke1, poke2){
+  return poke1.PokedexNumber - poke2.PokedexNumber;
 }
 
 function generePokeCardHead(pokemon){
   return`
   <div class="column">
-  <div class="card">
+  <div id="PokeCard" class="card">
     <div class="card-header">
       <div class="card-header-title">${pokemon.JapaneseName}</div>
     </div>
