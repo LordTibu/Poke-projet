@@ -287,13 +287,23 @@ function genereModaleLoginBody(etatCourant) {
     etatCourant.errLogin !== undefined
       ? etatCourant.errLogin
       : etatCourant.login;
+
+      console.log('este es el estado');
+      console.log(etatCourant);
   return {
     html: `
   <section class="modal-card-body">
-    <p>${text}</p>
+  <label for="keyapi">Api-Key:</label>
+  <input type="text" id="keyapi" name="keyapi"><br><br>
+  <a id="validateConnect" class="button is-light"> Validate </a>
+  <p>${text}</p>
   </section>
   `,
-    callbacks: {},
+    callbacks: {
+      "validateConnect": {
+        onclick: () =>afficheModaleConnexion(etatCourant, document.getElementById('keyapi').value),
+      },
+    },
   };
 }
 
@@ -331,18 +341,25 @@ function genereModaleLoginHeader(etatCourant) {
  * des callbacks à enregistrer dans le champ callbacks
  */
 function genereModaleLoginFooter(etatCourant) {
-  return {
-    html: `
-  <footer class="modal-card-foot" style="justify-content: flex-end">
-    <button id="btn-close-login-modal2" class="button">Fermer</button>
-  </footer>
-  `,
-    callbacks: {
-      "btn-close-login-modal2": {
-        onclick: () => majEtatEtPage(etatCourant, { loginModal: false }),
-      },
-    },
-  };
+
+  if(etatCourant.loginModal && etatCourant.login !== undefined 
+    && etatCourant.errLogin === undefined){
+    majEtatEtPage(etatCourant, { loginModal: false });
+  } else {
+      return {
+        html: `
+      <footer class="modal-card-foot" style="justify-content: flex-end">
+        <button id="btn-close-login-modal2" class="button">Fermer</button>
+      </footer>
+      `,
+        callbacks: {
+          "btn-close-login-modal2": {
+            onclick: () => majEtatEtPage(etatCourant, { loginModal: false }),
+          },
+        },
+      };
+    }
+  
 }
 
 /**
@@ -382,7 +399,9 @@ function genereModaleLogin(etatCourant) {
  * @param {Etat} etatCourant
  */
 function afficheModaleConnexion(etatCourant,keyapi) {
-  lanceWhoamiEtInsereLogin(etatCourant,keyapi);
+  console.log('si oprime');
+  console.log(keyapi);
+  lanceWhoamiEtInsereLogin(etatCourant,keyapi)
 }
 
 /**
@@ -398,8 +417,6 @@ function genereBoutonConnexion(etatCourant) {
     <div class="navbar-item">
       <div class="buttons">
         <a id="btn-open-login-modal" class="button is-light"> Connexion </a>
-        <label for="keyapi">Api-Key:</label>
-        <input type="password" id="keyapi" name="keyapi"><br><br>
       </div>
     </div>
   </div>`;
@@ -411,24 +428,27 @@ function genereBoutonConnexion(etatCourant) {
       </div>
     </div>
   </div>`;
-  if(etatCourant.errLogin === undefined){
+  if(etatCourant.login !== undefined){
     return {
-    html: html,
+    html: html2,
     callbacks: {
       "btn-open-login-modal": {
-        onclick: () => afficheModaleConnexion(etatCourant,document.getElementById("keyapi").value),
+        onclick: () => majEtatEtPage(etatCourant, { login: undefined }),
       },
     },
   };
   } else {
-    return {html: html2,
+    console.log('verga');
+    return {
+      html: html,
       callbacks: {
         "btn-open-login-modal": {
-          onclick: () => afficheModaleConnexion(etatCourant,document.getElementById("keyapi").value),
+          onclick: () => afficheModaleConnexion(etatCourant,document.getElementById('keyapi')),
         },
       },
     };
   }
+    
 }
 
 /**
