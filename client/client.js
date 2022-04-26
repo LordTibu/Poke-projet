@@ -431,6 +431,7 @@ function genereBoutonConnexion(etatCourant) {
   if(etatCourant.login !== undefined){
     return {
     html: html2,
+    //partie deconnexion
     callbacks: {
       "btn-open-login-modal": {
         onclick: () => majEtatEtPage(etatCourant, { login: undefined }),
