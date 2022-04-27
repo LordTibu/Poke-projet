@@ -68,8 +68,7 @@ function generePokeName(pokemon){
 
 function generePokemonCallbacks(etatActuel, pokemon){
   return {[pokemon.Name] : {onclick : () => {console.log(`Clicked on ${pokemon.Name}`);
-    document.getElementById(pokemon.Name).classList.toggle("is-selected");
-    document.getElementById("PokeCard").innerHTML = generePokeCard(pokemon);
+    majEtatEtPage(etatActuel, {selectedPokemon : pokemon})
     }
   }};
 }
@@ -164,18 +163,17 @@ function generePokeListeFooter(){
   </div>`
 }
 
-function genereListePokemon(etatCourant, poke = bulba){
-  return fetchPokemon().then(pokeArray => {
-    const htmlArray = pokeArray.sort(pokeNumberCompare).map(pokemon => generePokemonHTML(pokemon));
-    const callb = Object.assign({}, ...pokeArray.map(
-      pokemon => generePokemonCallbacks(etatCourant, pokemon)));
-    const callb2 = genereListeCallbacks(etatCourant);
-    majPage(etatCourant, {html:generePokeListeHead() + htmlArray.join("\n") +
-    generePokeListeFooter() + generePokeCard(poke) + `</div>
-    </div>
-    </section>`,
-    callbacks: {...callb, ...callb2}});
-  });
+function genereListePokemon(etatCourant){
+  const htmlArray = etatCourant.pokemon.sort(pokeNumberCompare).map(pokemon => generePokemonHTML(pokemon));
+  const callb = Object.assign({}, ...etatCourant.pokemon.map(
+    pokemon => generePokemonCallbacks(etatCourant, pokemon)));
+  const callb2 = genereListeCallbacks(etatCourant);
+  return {html:generePokeListeHead() + htmlArray.join("\n") +
+  generePokeListeFooter() + generePokeCard(etatCourant.selectedPokemon) +
+  `</div>
+  </div>
+  </section>`,
+  callbacks: {...callb, ...callb2}};
 }
 
 function pokeNumberCompare(poke1, poke2){
@@ -254,6 +252,7 @@ function generePokeCard(pokemon){
   const head = generePokeCardHead(pokemon);
   const body = generePokeCardBody(pokemon);
   const foot = generePokeCardFoot(pokemon);
+  
   return head + body + foot;
 }
 
@@ -488,6 +487,7 @@ function genereBarreNavigation(etatCourant) {
  */
 function generePage(etatCourant) {
   const barredeNavigation = genereBarreNavigation(etatCourant);
+  const pokemon = genereListePokemon(etatCourant)
   const modaleLogin = genereModaleLogin(etatCourant);
   // remarquer l'usage de la notation ... ci-dessous qui permet de "fusionner"
   // les dictionnaires de callbacks qui viennent de la barre et de la modale.
@@ -497,8 +497,10 @@ function generePage(etatCourant) {
   // modaleLogin portent sur des zone différentes de la page et n'ont pas
   // d'éléments en commun.
   return {
-    html: barredeNavigation.html + modaleLogin.html,
-    callbacks: { ...barredeNavigation.callbacks, ...modaleLogin.callbacks },
+    html: barredeNavigation.html + pokemon.html +modaleLogin.html,
+    callbacks: {...barredeNavigation.callbacks,
+      ...pokemon.callbacks,
+      ...modaleLogin.callbacks},
   };
 }
 
@@ -560,11 +562,11 @@ function enregistreCallbacks(callbacks) {
  *
  * @param {Etat} etatCourant l'état courant
  */
-function majPage(etatCourant, listePokemon = "") {
+function majPage(etatCourant) {
   console.log("CALL majPage");
   const page = generePage(etatCourant);
-  document.getElementById("root").innerHTML = page.html + listePokemon.html;
-  enregistreCallbacks({...page.callbacks, ...listePokemon.callbacks});
+  document.getElementById("root").innerHTML = page.html;
+  enregistreCallbacks(page.callbacks);
 }
 
 /**
@@ -579,7 +581,11 @@ function initClientPokemons() {
     login: undefined,
     errLogin: undefined,
   };
-  genereListePokemon(etatInitial);
+  fetchPokemon().then(pokeArray => {
+    majEtatEtPage(etatInitial, {
+      pokemon : pokeArray,
+      selectedPokemon: pokeArray[0]})
+  })
 }
 
 // Appel de la fonction init_client_duels au après chargement de la page
