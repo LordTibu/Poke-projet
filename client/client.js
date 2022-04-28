@@ -67,8 +67,14 @@ function generePokeName(pokemon){
 }
 
 function generePokemonCallbacks(etatActuel, pokemon){
-  return {[pokemon.Name] : {onclick : () => {console.log(`Clicked on ${pokemon.Name}`);
-    majEtatEtPage(etatActuel, {selectedPokemon : pokemon})
+  return {[pokemon.Name] : {onclick : () => {
+    console.log(`Clicked on ${pokemon.Name}`);
+    document.getElementById("tbl-pokemons").
+    getElementsByClassName("is-selected")[0].
+    classList.toggle("is-selected");
+    document.getElementById(pokemon.Name).classList.toggle("is-selected");
+    etatActuel.selectedPokemon = pokemon;
+    document.getElementById("PokeCard").innerHTML = generePokeCardChimbo(pokemon);
     }
   }};
 }
@@ -138,22 +144,20 @@ function generePokeListeHead(){
 
 function genereListeCallbacks(etatActuel){
   return {
-    "pokeListeNumber" : {onclick : () => {console.log(`Clicked on pokeListeNumber`);
-      document.getElementById("pokeListeNumber").insertAdjacentHTML("beforeend",
-      `<span class="icon"><i class="fas fa-angle-up"></i></span>`);}
+    "pokeListeNumber" : {onclick : () => {
+      console.log(`Clicked on pokeListeNumber`);
+      majEtatEtPage(etatActuel, {sort: pokeNumberCompare})}
     },
     "pokeListeName" : {onclick : () => {console.log(`Clicked on pokeListeName`);
-      document.getElementById("pokeListeName").insertAdjacentHTML("beforeend",
-     `<span class="icon"><i class="fas fa-angle-up"></i></span>`);}
+    majEtatEtPage(etatActuel, {sort: pokeNameCompare})}
     },
     "pokeListeAbilt" : {onclick : () => {console.log(`Clicked on pokeListeAbilt`);
-      document.getElementById("pokeListeAbilt").insertAdjacentHTML("beforeend",
-     `<span class="icon"><i class="fas fa-angle-up"></i></span>`);}
+    majEtatEtPage(etatActuel, {sort: pokeAbilitiesCompare})}
     },
     "pokeListeTypes" : {onclick : () => {console.log(`Clicked on pokeListeTypes`);
-      document.getElementById("pokeListeTypes").insertAdjacentHTML("beforeend",
-     `<span class="icon"><i class="fas fa-angle-up"></i></span>`);}},
-    };
+    majEtatEtPage(etatActuel, {sort: pokeTypeCompare})}
+    }
+  };
 }
 
 function generePokeListeFooter(){
@@ -164,7 +168,7 @@ function generePokeListeFooter(){
 }
 
 function genereListePokemon(etatCourant){
-  const htmlArray = etatCourant.pokemon.sort(pokeNumberCompare).map(pokemon => generePokemonHTML(pokemon));
+  const htmlArray = etatCourant.pokemon.sort(etatCourant.sort).map(pokemon => generePokemonHTML(pokemon));
   const callb = Object.assign({}, ...etatCourant.pokemon.map(
     pokemon => generePokemonCallbacks(etatCourant, pokemon)));
   const callb2 = genereListeCallbacks(etatCourant);
@@ -180,10 +184,41 @@ function pokeNumberCompare(poke1, poke2){
   return poke1.PokedexNumber - poke2.PokedexNumber;
 }
 
+function pokeNameCompare(poke1, poke2, asc){
+  return poke1.Name > poke2.Name;
+}
+
+function pokeTypeCompare(poke1, poke2, asc){
+  return poke1.Types > poke2.Types;
+}
+
+function pokeAbilitiesCompare(poke1, poke2, asc){
+  return poke1.Abilities > poke2.Abilities;
+}
+
 function generePokeCardHead(pokemon){
   return`
   <div class="column">
   <div id="PokeCard" class="card">
+    <div class="card-header">
+      <div class="card-header-title">${pokemon.JapaneseName}</div>
+    </div>
+    <div class="card-content">
+      <article class="media">
+        <div class="media-content">
+          <h1 class="title">${pokemon.Name}</h1>
+        </div>
+      </article>
+    </div>
+    <div class="card-content">
+      <article class="media">
+        <div class="media-content">
+          <div class="content has-text-left">
+            <p>Hit points: ${pokemon.Hp}</p>`
+}
+
+function generePokeCardHeadChimbo(pokemon){
+  return`
     <div class="card-header">
       <div class="card-header-title">${pokemon.JapaneseName}</div>
     </div>
@@ -252,7 +287,14 @@ function generePokeCard(pokemon){
   const head = generePokeCardHead(pokemon);
   const body = generePokeCardBody(pokemon);
   const foot = generePokeCardFoot(pokemon);
-  
+  return head + body + foot;
+}
+
+function generePokeCardChimbo(pokemon){
+  console.log("se genero carta");
+  const head = generePokeCardHeadChimbo(pokemon);
+  const body = generePokeCardBody(pokemon);
+  const foot = generePokeCardFoot(pokemon);
   return head + body + foot;
 }
 
@@ -567,6 +609,7 @@ function majPage(etatCourant) {
   const page = generePage(etatCourant);
   document.getElementById("root").innerHTML = page.html;
   enregistreCallbacks(page.callbacks);
+  document.getElementById(etatCourant.selectedPokemon.Name).classList.toggle("is-selected");
 }
 
 /**
@@ -584,7 +627,10 @@ function initClientPokemons() {
   fetchPokemon().then(pokeArray => {
     majEtatEtPage(etatInitial, {
       pokemon : pokeArray,
-      selectedPokemon: pokeArray[0]})
+      selectedPokemon: pokeArray[0],
+      sort: pokeNumberCompare,
+      asc : true
+    })
   })
 }
 
