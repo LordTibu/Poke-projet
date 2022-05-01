@@ -26,6 +26,7 @@ const bulba = {"Abilities":["Torrent","Rain Dish"],
  * @returns une promesse du login utilisateur ou du message d'erreur
  */
 function fetchWhoami(keyapi) {
+  if(keyapi !== undefined){
   return fetch(serverUrl + "/whoami", { headers: { "Api-Key": keyapi } })
     .then((response) => {
       if (response.status === 401) {
@@ -38,10 +39,11 @@ function fetchWhoami(keyapi) {
       }
     })
     .catch((erreur) => ({ err: erreur }));
+  }
 }
 
 // Get all pokemons from server
-function fetchPokemon() {
+const fetchPokemon = () => {
   return fetch(serverUrl + "/pokemon").then((response) => {return response.json()});
 }
 
@@ -180,19 +182,19 @@ function genereListePokemon(etatCourant){
   callbacks: {...callb, ...callb2}};
 }
 
-function pokeNumberCompare(poke1, poke2){
+const pokeNumberCompare =(poke1, poke2)=> {
   return poke1.PokedexNumber - poke2.PokedexNumber;
 }
 
-function pokeNameCompare(poke1, poke2, asc){
+const pokeNameCompare = (poke1, poke2, asc) =>{
   return poke1.Name > poke2.Name;
 }
 
-function pokeTypeCompare(poke1, poke2, asc){
+const pokeTypeCompare = (poke1, poke2, asc)=>{
   return poke1.Types > poke2.Types;
 }
 
-function pokeAbilitiesCompare(poke1, poke2, asc){
+const pokeAbilitiesCompare = (poke1, poke2, asc)=>{
   return poke1.Abilities > poke2.Abilities;
 }
 
@@ -324,25 +326,24 @@ function lanceWhoamiEtInsereLogin(etatCourant,keyapi) {
  * dans le champ callbacks
  */
 function genereModaleLoginBody(etatCourant) {
-  const text =
-    etatCourant.errLogin !== undefined
-      ? etatCourant.errLogin
-      : etatCourant.login;
-
-      console.log('este es el estado');
-      console.log(etatCourant);
-  return {
-    html: `
+  const html = `
   <section class="modal-card-body">
   <label for="keyapi">Api-Key:</label>
-  <input type="text" id="keyapi" name="keyapi"><br><br>
-  <a id="validateConnect" class="button is-light"> Validate </a>
-  <p>${text}</p>
+  <input type="password" id="keyapi" name="keyapi"><br><br>
   </section>
-  `,
+  <footer class="modal-card-foot" style="justify-content: flex-end">
+  <a id="validateConnect" class="button"> Validate </a>
+  <button id="btn-close-login-modal2" class="button">Fermer</button>
+  </footer>
+  `;
+  return {
+    html: html,
     callbacks: {
       "validateConnect": {
-        onclick: () =>afficheModaleConnexion(etatCourant, document.getElementById('keyapi').value),
+        onclick: () =>(afficheModaleConnexion(etatCourant, document.getElementById('keyapi').value),
+        majEtatEtPage(etatCourant, { loginModal: false })),
+      },"btn-close-login-modal2": {
+        onclick: () => majEtatEtPage(etatCourant, { loginModal: false }),
       },
     },
   };
@@ -373,7 +374,6 @@ function genereModaleLoginHeader(etatCourant) {
     },
   };
 }
-
 /**
  * Génère le code HTML du base de page de la modale de login et les callbacks associés.
  *
@@ -388,11 +388,6 @@ function genereModaleLoginFooter(etatCourant) {
     majEtatEtPage(etatCourant, { loginModal: false });
   } else {
       return {
-        html: `
-      <footer class="modal-card-foot" style="justify-content: flex-end">
-        <button id="btn-close-login-modal2" class="button">Fermer</button>
-      </footer>
-      `,
         callbacks: {
           "btn-close-login-modal2": {
             onclick: () => majEtatEtPage(etatCourant, { loginModal: false }),
@@ -440,57 +435,44 @@ function genereModaleLogin(etatCourant) {
  * @param {Etat} etatCourant
  */
 function afficheModaleConnexion(etatCourant,keyapi) {
-  console.log('si oprime');
-  console.log(keyapi);
-  lanceWhoamiEtInsereLogin(etatCourant,keyapi)
+  lanceWhoamiEtInsereLogin(etatCourant,keyapi);
 }
 
 /**
- * Génère le code HTML et les callbacks pour la partie droite de la barre de
+ * Génère le code HTML et les callbacks pour la partie gauche de la barre de
  * navigation qui contient le bouton de login.
  * @param {Etat} etatCourant
  * @returns un objet contenant le code HTML dans le champ html et la description
  * des callbacks à enregistrer dans le champ callbacks
  */
 function genereBoutonConnexion(etatCourant) {
-  const html = `
-  <div class="navbar-end">
-    <div class="navbar-item">
-      <div class="buttons">
-        <a id="btn-open-login-modal" class="button is-light"> Connexion </a>
-      </div>
-    </div>
-  </div>`;
-  const html2 = `
-  <div class="navbar-end">
-    <div class="navbar-item">
-      <div class="buttons">
-        <a id="btn-open-login-modal" class="button is-light"> Deconnexion </a>
-      </div>
-    </div>
-  </div>`;
+  const text =
+    etatCourant.errLogin !== undefined
+      ? etatCourant.errLogin
+      : etatCourant.login;
+  const htmlConnexion = `<a id="btn-open-login-modal" class="button is-light"> Connexion </a>`;
+  const htmlDeconnexion = `<p>${text}</p><a id="btn-open-login-modal" class="button is-light"> Deconnexion </a>`;
+  console.log("este es el estado");
+  console.log(etatCourant);
   if(etatCourant.login !== undefined){
     return {
-    html: html2,
-    //partie deconnexion
+    html: htmlDeconnexion,
     callbacks: {
       "btn-open-login-modal": {
-        onclick: () => majEtatEtPage(etatCourant, { login: undefined }),
+        onclick: () => majEtatEtPage(etatCourant, { loginModal: false , login: undefined, apiKey: undefined }),
       },
     },
   };
-  } else {
-    console.log('verga');
+  } else if(etatCourant.errLogin === undefined){
     return {
-      html: html,
+      html: htmlConnexion,
       callbacks: {
         "btn-open-login-modal": {
-          onclick: () => afficheModaleConnexion(etatCourant,document.getElementById('keyapi')),
+          onclick: () => majEtatEtPage(etatCourant, { loginModal: true }),
         },
       },
     };
   }
-    
 }
 
 /**
@@ -503,14 +485,22 @@ function genereBarreNavigation(etatCourant) {
   const connexion = genereBoutonConnexion(etatCourant);
   return {
     html: `
-  <nav class="navbar" role="navigation" aria-label="main navigation">
+  <nav class="navbar-start" role="navigation" aria-label="main navigation">
     <div class="navbar">
-      <div class="navbar-item"><div class="buttons">
-          <a id="btn-pokedex" class="button is-light"> Pokedex </a>
-          <a id="btn-combat" class="button is-light"> Combat </a>
-      </div></div>
-      ${connexion.html}
+      <div class="navbar-item">
+        <div class="buttons">
+            <a id="btn-pokedex" class="button is-light"> Pokedex </a>
+            <a id="btn-combat" class="button is-light"> Combat </a>
+        </div>
+      </div>
     </div>
+  </nav>
+  <nav class="navbar-end" role="navigation" aria-label="main navigation">
+      <div class="navbar">
+      <div class=navbar-item">
+      <div class=buttons">
+      ${connexion.html}
+      </div></div></div>
   </nav>`,
     callbacks: {
       ...connexion.callbacks,
@@ -607,7 +597,7 @@ function enregistreCallbacks(callbacks) {
 function majPage(etatCourant) {
   console.log("CALL majPage");
   const page = generePage(etatCourant);
-  document.getElementById("root").innerHTML = page.html;
+  document.getElementById("pagina").innerHTML = page.html;
   enregistreCallbacks(page.callbacks);
   document.getElementById(etatCourant.selectedPokemon.Name).classList.toggle("is-selected");
 }
