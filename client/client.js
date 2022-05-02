@@ -163,14 +163,18 @@ function genereListeCallbacks(etatActuel){
 function generePokeListeFooter(){
   return `</tbody>
   </table>
+  <button class="button" id="moreButton" tabindex="0">More</button>
   </div>
   </div>`
 }
 
 function genereListePokemon(etatCourant){
-  const htmlArray = etatCourant.pokemon.sort(etatCourant.sort).map(pokemon => generePokemonHTML(pokemon));
-  const callb = Object.assign({}, ...etatCourant.pokemon.map(
-    pokemon => generePokemonCallbacks(etatCourant, pokemon)));
+  const htmlArray = etatCourant.pokemon.sort(etatCourant.sort).
+  slice(0, etatCourant.seenPokemon).
+  map(pokemon => generePokemonHTML(pokemon));
+  const callb = Object.assign({}, ...etatCourant.pokemon.
+    slice(0, etatCourant.seenPokemon).
+    map( pokemon => generePokemonCallbacks(etatCourant, pokemon)));
   const callb2 = genereListeCallbacks(etatCourant);
   return {html:generePokeListeHead() + htmlArray.join("\n") +
   generePokeListeFooter() + generePokeCard(etatCourant.selectedPokemon) +
@@ -629,7 +633,8 @@ function initClientPokemons() {
       pokemon : pokeArray,
       selectedPokemon: pokeArray[0],
       sort: pokeNumberCompare,
-      asc : true
+      asc : true,
+      seenPokemon : 10
     })
   })
 }
