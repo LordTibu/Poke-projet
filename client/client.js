@@ -71,9 +71,10 @@ function generePokeName(pokemon){
 function generePokemonCallbacks(etatActuel, pokemon){
   return {[pokemon.Name] : {onclick : () => {
     console.log(`Clicked on ${pokemon.Name}`);
+    if(document.getElementById("Liste").getElementsByClassName("is-selected")[0] !== undefined){
     document.getElementById("tbl-pokemons").
     getElementsByClassName("is-selected")[0].
-    classList.toggle("is-selected");
+    classList.toggle("is-selected");}
     document.getElementById(pokemon.Name).classList.toggle("is-selected");
     etatActuel.selectedPokemon = pokemon;
     document.getElementById("PokeCard").innerHTML = generePokeCardChimbo(pokemon);
@@ -128,7 +129,7 @@ function generePokeListeHead(){
             </ul>
           </div>
           <div id="tbl-pokemons">
-          <table class="table">
+          <table class="table" id ="Liste">
             <thead>
               <tr>
                 <th><span>Image</span></th>
@@ -148,26 +149,35 @@ function genereListeCallbacks(etatActuel){
   return {
     "pokeListeNumber" : {onclick : () => {
       console.log(`Clicked on pokeListeNumber`);
-      majEtatEtPage(etatActuel, {sort: pokeNumberCompare})}
+      majEtatEtPage(etatActuel, {sort: pokeNumberCompare, seenPokemon : 10})}
     },
     "pokeListeName" : {onclick : () => {console.log(`Clicked on pokeListeName`);
-    majEtatEtPage(etatActuel, {sort: pokeNameCompare})}
+    majEtatEtPage(etatActuel, {sort: pokeNameCompare, seenPokemon : 10})}
     },
     "pokeListeAbilt" : {onclick : () => {console.log(`Clicked on pokeListeAbilt`);
-    majEtatEtPage(etatActuel, {sort: pokeAbilitiesCompare})}
+    majEtatEtPage(etatActuel, {sort: pokeAbilitiesCompare, seenPokemon : 10})}
     },
     "pokeListeTypes" : {onclick : () => {console.log(`Clicked on pokeListeTypes`);
-    majEtatEtPage(etatActuel, {sort: pokeTypeCompare})}
+    majEtatEtPage(etatActuel, {sort: pokeTypeCompare, seenPokemon : 10})}
     }
   };
 }
 
-function generePokeListeFooter(){
-  return `</tbody>
-  </table>
-  <button class="button" id="moreButton" tabindex="0">More</button>
-  </div>
-  </div>`
+function generePokeListeFooter(etatCourant){
+  return {
+    html: `</tbody>
+    </table>
+    <button class="button" id="moreButton" tabindex="0">More</button>
+    </div>
+    </div>`,
+    callbacks : {"moreButton" : {onclick : () => {console.log("Clicked on more");
+      document.getElementById("Liste").insertAdjacentHTML("beforeend",
+      etatCourant.pokemon.sort(etatCourant.sort).
+      slice(etatCourant.seenPokemon, etatCourant.seenPokemon + 10).
+      map(pokemon => generePokemonHTML(pokemon)).join("\n"))
+      etatCourant.seenPokemon += 10;}
+    }}
+  }
 }
 
 function genereListePokemon(etatCourant){
@@ -175,30 +185,32 @@ function genereListePokemon(etatCourant){
   slice(0, etatCourant.seenPokemon).
   map(pokemon => generePokemonHTML(pokemon));
   const callb = Object.assign({}, ...etatCourant.pokemon.
+    sort(etatCourant.sort).
     slice(0, etatCourant.seenPokemon).
     map( pokemon => generePokemonCallbacks(etatCourant, pokemon)));
+    console.log(callb);
   const callb2 = genereListeCallbacks(etatCourant);
   return {html:generePokeListeHead() + htmlArray.join("\n") +
-  generePokeListeFooter() + generePokeCard(etatCourant.selectedPokemon) +
+  generePokeListeFooter(etatCourant).html + generePokeCard(etatCourant.selectedPokemon) +
   `</div>
   </div>
   </section>`,
-  callbacks: {...callb, ...callb2}};
+  callbacks: {...callb, ...generePokeListeFooter(etatCourant).callbacks, ...callb2}};
 }
 
 const pokeNumberCompare =(poke1, poke2)=> {
   return poke1.PokedexNumber - poke2.PokedexNumber;
 }
 
-const pokeNameCompare = (poke1, poke2, asc) =>{
+const pokeNameCompare = (poke1, poke2) =>{
   return poke1.Name > poke2.Name;
 }
 
-const pokeTypeCompare = (poke1, poke2, asc)=>{
+const pokeTypeCompare = (poke1, poke2)=>{
   return poke1.Types > poke2.Types;
 }
 
-const pokeAbilitiesCompare = (poke1, poke2, asc)=>{
+const pokeAbilitiesCompare = (poke1, poke2)=>{
   return poke1.Abilities > poke2.Abilities;
 }
 
@@ -603,7 +615,6 @@ function majPage(etatCourant) {
   const page = generePage(etatCourant);
   document.getElementById("pagina").innerHTML = page.html;
   enregistreCallbacks(page.callbacks);
-  document.getElementById(etatCourant.selectedPokemon.Name).classList.toggle("is-selected");
 }
 
 /**
@@ -621,9 +632,8 @@ function initClientPokemons() {
   fetchPokemon().then(pokeArray => {
     majEtatEtPage(etatInitial, {
       pokemon : pokeArray,
-      selectedPokemon: pokeArray[0],
+      selectedPokemon: pokeArray[18],
       sort: pokeNumberCompare,
-      asc : true,
       seenPokemon : 10
     })
   })
