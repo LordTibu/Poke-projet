@@ -4,18 +4,6 @@
 //const apiKey = "bafae61a-54b5-4977-94d4-d8159bec8262";
 const serverUrl = "https://lifap5.univ-lyon1.fr";
 //const allPokemon = fetch(serverUrl + "/pokemon").then((response) => {return response.json()});
-const bulba = {"Abilities":["Torrent","Rain Dish"],
-"Against":{"Bug":1,"Dark":1,"Dragon":1,"Electric":2,
-"Fairy":1,"Fight":1,"Fire":0.5,"Flying":1,"Ghost":1,
-"Grass":2,"Ground":1,"Ice":0.5,"Normal":1,"Poison":1,
-"Psychic":1,"Rock":1,"Steel":0.5,"Water":0.5},"Attack":103,
-"BaseEggSteps":5120,"BaseHappiness":70,"BaseTotal":630,
-"CaptureRate":45,"Classification":"","Defense":120,
-"ExperienceGrowth":1059860,"Generation":1,"HeightM":1.6,
-"Hp":79,"Images":{"Full":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/009.png",
-"Detail":"https://assets.pokemon.com/assets/cms2/img/pokedex/detail/009.png"},
-"IsLegendary":0,"JapaneseName":"Kamexカメックス","Name":"Blastoise","PercentageMale":88.1,
-"PokedexNumber":9,"SpAttack":135,"SpDefense":115,"Speed":78,"Types":["water"],"WeightKg":85.5}
 
 /* ******************************************************************
  * Gestion de la boîte de dialogue (a.k.a. modal) d'affichage de
@@ -147,6 +135,10 @@ function generePokeListeHead(){
 
 function genereListeCallbacks(etatActuel){
   return {
+    "tab-tout" : {onclick : () => {
+      console.log("clicked on deck show");
+      
+    }},
     "pokeListeNumber" : {onclick : () => {
       console.log(`Clicked on pokeListeNumber`);
       majEtatEtPage(etatActuel, {sort: pokeNumberCompare, seenPokemon : 10})}
@@ -167,15 +159,22 @@ function generePokeListeFooter(etatCourant){
   return {
     html: `</tbody>
     </table>
+    <button class="button" id="lessButton" tabindex="0">Less</button>
     <button class="button" id="moreButton" tabindex="0">More</button>
     </div>
     </div>`,
-    callbacks : {"moreButton" : {onclick : () => {console.log("Clicked on more");
-      document.getElementById("Liste").insertAdjacentHTML("beforeend",
+    callbacks : {"moreButton" : {onclick : () => {
+      console.log("Clicked on more");
+      document.getElementById("PokeListe").insertAdjacentHTML("beforeend",
       etatCourant.pokemon.sort(etatCourant.sort).
       slice(etatCourant.seenPokemon, etatCourant.seenPokemon + 10).
-      map(pokemon => generePokemonHTML(pokemon)).join("\n"))
-      etatCourant.seenPokemon += 10;}
+      map(pokemon => generePokemonHTML(pokemon)).join("\n"));
+      etatCourant.seenPokemon += 10;
+      enregistreCallbacks(Object.assign({}, ...etatCourant.pokemon.
+        sort(etatCourant.sort).
+        slice(0, etatCourant.seenPokemon).
+        map( pokemon => generePokemonCallbacks(etatCourant, pokemon))))
+      }
     }}
   }
 }
@@ -280,7 +279,7 @@ function generePokeCardFoot(pokemon){
   <figure class="image is-475x475">
             <img
               class=""
-              src="${pokemon.Images.Detail}"
+              src="${pokemon.Images.Full}"
               alt="${pokemon.Name}"
             />
           </figure>
