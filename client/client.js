@@ -187,18 +187,39 @@ function genereListeCallbacks(etatActuel){
       majEtatEtPage(etatActuel, {seenPokemon : etatActuel.seenPokemon - 10})
     }},
     "pokeListeNumber" : {onclick : () => {
-      console.log(`Clicked on pokeListeNumber`);
-      majEtatEtPage(etatActuel, {sort: pokeNumberCompare})}
-    },
-    "pokeListeName" : {onclick : () => {console.log(`Clicked on pokeListeName`);
-    majEtatEtPage(etatActuel, {sort: pokeNameCompare})}
-    },
-    "pokeListeAbilt" : {onclick : () => {console.log(`Clicked on pokeListeAbilt`);
-    majEtatEtPage(etatActuel, {sort: pokeAbilitiesCompare})}
-    },
-    "pokeListeTypes" : {onclick : () => {console.log(`Clicked on pokeListeTypes`);
-    majEtatEtPage(etatActuel, {sort: pokeTypeCompare})}
-    }
+      if(etatActuel.click === "numberDESC"){
+        console.log(`Clicked on pokeListeNumber`);
+        majEtatEtPage(etatActuel, {sort: pokeNumberCompareAsc, click :undefined})
+      } else {
+        majEtatEtPage(etatActuel, {sort: pokeNumberCompareDesc, click : "numberDESC"})
+      }
+    }},
+    "pokeListeName" : {onclick : () => {
+      if(etatActuel.click === "nameDESC"){
+        console.log(`Clicked on pokeListeName`);
+        majEtatEtPage(etatActuel, {sort: pokeNumberCompareAsc, click :undefined})
+      } else {
+        majEtatEtPage(etatActuel, {sort: pokeNumberCompareDesc, click : "nameDESC"})
+      }
+    }},
+    "pokeListeAbilt" : {onclick : () => {
+      if(etatActuel.click === "abilDESC"){
+        console.log(`Clicked on pokeListeTypes`);
+        majEtatEtPage(etatActuel, {sort: pokeAbilitiesCompareAsc, click :undefined})
+      } else {
+        console.log(`Clicked on pokeListeTypesDESC`);
+        majEtatEtPage(etatActuel, {sort: pokeAbilitiesCompareDesc, click : "abilDESC"})
+      }
+    }},
+    "pokeListeTypes" : {onclick : () => {
+      if(etatActuel.click === "typeDESC"){
+        console.log(`Clicked on pokeListeTypes`);
+        majEtatEtPage(etatActuel, {sort: pokeTypeCompareAsc, click :undefined})
+      } else {
+        console.log(`Clicked on pokeListeTypesDESC`);
+        majEtatEtPage(etatActuel, {sort: pokeTypeCompareDesc, click : "typeDESC"})
+      }
+    }}
   };
 }
 
@@ -269,7 +290,18 @@ function genereListePokemon(etatCourant){
  * @param {Etat} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
-const pokeNumberCompare =(poke1, poke2)=> {
+ const pokeNumberCompareDesc =(poke1, poke2)=> {
+  return poke2.PokedexNumber - poke1.PokedexNumber;
+}
+
+/**
+ * Fonction pour comparer deux pokemons selon le numero dans la pokedex
+ * pour faire le sort du array avec les pokemons
+ * @param {Etat} poke1 Pokemon numero 1
+ * @param {Etat} poke2 Pokemon numero 2
+ * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
+ */
+const pokeNumberCompareAsc =(poke1, poke2)=> {
   return poke1.PokedexNumber - poke2.PokedexNumber;
 }
 
@@ -280,8 +312,19 @@ const pokeNumberCompare =(poke1, poke2)=> {
  * @param {Etat} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
-const pokeNameCompare = (poke1, poke2) =>{
+const pokeNameCompareAsc = (poke1, poke2) =>{
   return poke1.Name > poke2.Name;
+}
+
+/**
+ * Fonction pour comparer deux pokemons selon leur nom
+ * pour faire le sort du array avec les pokemons
+ * @param {Etat} poke1 Pokemon numero 1
+ * @param {Etat} poke2 Pokemon numero 2
+ * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
+ */
+ const pokeNameCompareDesc = (poke1, poke2) =>{
+  return poke1.Name < poke2.Name;
 }
 
 /**
@@ -291,8 +334,19 @@ const pokeNameCompare = (poke1, poke2) =>{
  * @param {Etat} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
-const pokeTypeCompare = (poke1, poke2)=>{
-  return poke1.Types > poke2.Types;
+const pokeTypeCompareAsc = (poke1, poke2)=>{
+  return poke1.Types[0] <= poke2.Types[0];
+}
+
+/**
+ * Fonction pour comparer deux pokemons selon leur type
+ * pour faire le sort du array avec les pokemons
+ * @param {Etat} poke1 Pokemon numero 1
+ * @param {Etat} poke2 Pokemon numero 2
+ * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
+ */
+ const pokeTypeCompareDesc = (poke1, poke2)=>{
+  return poke1.Types[0] >= poke2.Types[0];
 }
 
 /**
@@ -302,8 +356,19 @@ const pokeTypeCompare = (poke1, poke2)=>{
  * @param {Etat} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
-const pokeAbilitiesCompare = (poke1, poke2)=>{
+ const pokeAbilitiesCompareAsc = (poke1, poke2)=>{
   return poke1.Abilities > poke2.Abilities;
+}
+
+/**
+ * Fonction pour comparer deux pokemons selon leurs abilities
+ * pour faire le sort du array avec les pokemons
+ * @param {Etat} poke1 Pokemon numero 1
+ * @param {Etat} poke2 Pokemon numero 2
+ * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
+ */
+const pokeAbilitiesCompareDesc = (poke1, poke2)=>{
+  return poke1.Abilities < poke2.Abilities;
 }
 
 /**
@@ -756,8 +821,9 @@ function initClientPokemons() {
     majEtatEtPage(etatInitial, {
       pokemon : pokeArray,
       selectedPokemon: pokeArray[18],
-      sort: pokeNumberCompare,
-      seenPokemon : 10
+      sort: pokeNumberCompareAsc,
+      seenPokemon : 10,
+      click : undefined
     })
   })
 }
