@@ -56,6 +56,13 @@ function generePokeName(pokemon){
     <td><div class="content">${pokemon.Name}</div></td>`;
 }
 
+/**
+ * Genere une callback de la pokeListe dependant du pokemon (utile pour faire 
+ * un map dans un array de pokemon)
+ * @param {Etat} pokemon pokemon selon lequel faire la callback
+ * @returns un objet contenant le callback dependant du pokemon et l'etat
+ * Actuel
+ */
 function generePokemonCallbacks(etatActuel, pokemon){
   return {[pokemon.Name] : {onclick : () => {
     console.log(`Clicked on ${pokemon.Name}`);
@@ -70,21 +77,45 @@ function generePokemonCallbacks(etatActuel, pokemon){
   }};
 }
 
+/**
+ * Genere le code HTML des abilities d'un pokemon, utilisé
+ * pour afficher le pokemon dans la pokeListe
+ * @param {Etat} pokemon pokemon selon lequel faire le HTML
+ * @returns une string contenant le code HTML
+ */
 function generePokeAbilities(pokemon){
   const t = pokemon.Abilities.map(type => `<li>${type}</li>`);
   return `<td><ul>` + t.join("\n") +`</ul></td>`;
 }
 
+/**
+ * Genere le code HTML des types d'un pokemon
+ * @param {Etat} pokemon pokemon selon lequel faire le HTML
+ * @returns une string contenant le code HTML
+ */
 function generePokeTypes(pokemon){
   const t = pokemon.Types.map(type => `<li>${type}</li>`);
   return `<td><ul>` + t.join("\n") +`</ul></td>`;
 }
 
+/**
+ * Genere le code HTML des abilities d'un pokemon, utilisé
+ * pour afficher la pokeCard (cf. "generePokeCard")
+ * @param {Etat} pokemon pokemon selon lequel le HTML
+ * @returns une string contenant le code HTML
+ */
 function generePokeAbilitiesCard(pokemon){
   const t = pokemon.Abilities.map(type => `<li>${type}</li>`);
   return t.join("\n");
 }
 
+/**
+ * Genere le code HTML des resistances d'un pokemon, utilisé
+ * pour afficher la pokeCard (cf. "generePokeCard")
+ * @param {Etat} pokemon pokemon selon lequel faire les resistances
+ * @returns un objet contenant le code HTML des resistances d'un poke
+ * dans le champ strong et weak dependant de la valeur de la resistance
+ */
 function generePokeResistances(pokemon){
   const against = Object.entries(pokemon.Against);
   const strong = against.filter(pair => pair[1] < 1).map(pair => `<li>${pair[0]}</li>`).join("\n");
@@ -95,7 +126,12 @@ function generePokeResistances(pokemon){
   }
 }
 
-// Genera la entrada de un pokemon en la lista de la izquierda
+/**
+ * genere le code HTML de l'entree de la liste pokedex (pokeListe) d'un pokemon
+ * @param {Etat} pokemon pokemon selon lequel genere le code HTML
+ * @returns une string contenant le code HTML de l'entree du pokemon dans la liste
+ * pokedex
+ */
 function generePokemonHTML(pokemon){
   const name = generePokeName(pokemon);
   const abilt = generePokeAbilities(pokemon);
@@ -103,6 +139,13 @@ function generePokemonHTML(pokemon){
   return name + abilt + types + `</tr>`;
 }
 
+/**
+ * Genere le code HTML du header de la liste de pokemons
+ *  a afficher selon le etatCourant
+ * où on garde le array de pokemons, le type de sort, le nb de pokes a afficher
+ * etc...
+ * @returns une string contenant le code HTML du header de la liste
+ */
 function generePokeListeHead(){
   return `
   <section class="section">
@@ -139,22 +182,35 @@ function genereListeCallbacks(etatActuel){
       console.log("clicked on deck show");
       
     }},
+    "lessButton" : {onclick : () => {
+      console.log("clicked on less");
+      majEtatEtPage(etatActuel, {seenPokemon : etatActuel.seenPokemon - 10})
+    }},
     "pokeListeNumber" : {onclick : () => {
       console.log(`Clicked on pokeListeNumber`);
-      majEtatEtPage(etatActuel, {sort: pokeNumberCompare, seenPokemon : 10})}
+      majEtatEtPage(etatActuel, {sort: pokeNumberCompare})}
     },
     "pokeListeName" : {onclick : () => {console.log(`Clicked on pokeListeName`);
-    majEtatEtPage(etatActuel, {sort: pokeNameCompare, seenPokemon : 10})}
+    majEtatEtPage(etatActuel, {sort: pokeNameCompare})}
     },
     "pokeListeAbilt" : {onclick : () => {console.log(`Clicked on pokeListeAbilt`);
-    majEtatEtPage(etatActuel, {sort: pokeAbilitiesCompare, seenPokemon : 10})}
+    majEtatEtPage(etatActuel, {sort: pokeAbilitiesCompare})}
     },
     "pokeListeTypes" : {onclick : () => {console.log(`Clicked on pokeListeTypes`);
-    majEtatEtPage(etatActuel, {sort: pokeTypeCompare, seenPokemon : 10})}
+    majEtatEtPage(etatActuel, {sort: pokeTypeCompare})}
     }
   };
 }
 
+/**
+ * Genere le code HTML du footer de la liste de pokemons
+ *  a afficher selon le etatCourant
+ * où on garde le array de pokemons, le type de sort, le nb de pokes a afficher
+ * etc...
+ * @param {Etat} etatCourant Etat Actuel du site web
+ * @returns un objet contenant le code HTML de la liste dans le champ html
+ * et les callbacks dans le champs callbacks
+ */
 function generePokeListeFooter(etatCourant){
   return {
     html: `</tbody>
@@ -179,6 +235,15 @@ function generePokeListeFooter(etatCourant){
   }
 }
 
+
+/**
+ * Genere le code HTML de la liste de pokemons (pokeListe) a afficher selon le etatCourant
+ * où on garde le array de pokemons, le type de sort, le nb de pokes a afficher
+ * etc...
+ * @param {Etat} etatCourant Etat Actuel du site web
+ * @returns un objet contenant le code HTML de la liste dans le champ html
+ * et les callbacks dans le champs callbacks
+ */
 function genereListePokemon(etatCourant){
   const htmlArray = etatCourant.pokemon.sort(etatCourant.sort).
   slice(0, etatCourant.seenPokemon).
@@ -197,22 +262,55 @@ function genereListePokemon(etatCourant){
   callbacks: {...callb, ...generePokeListeFooter(etatCourant).callbacks, ...callb2}};
 }
 
+/**
+ * Fonction pour comparer deux pokemons selon le numero dans la pokedex
+ * pour faire le sort du array avec les pokemons
+ * @param {Etat} poke1 Pokemon numero 1
+ * @param {Etat} poke2 Pokemon numero 2
+ * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
+ */
 const pokeNumberCompare =(poke1, poke2)=> {
   return poke1.PokedexNumber - poke2.PokedexNumber;
 }
 
+/**
+ * Fonction pour comparer deux pokemons selon leur nom
+ * pour faire le sort du array avec les pokemons
+ * @param {Etat} poke1 Pokemon numero 1
+ * @param {Etat} poke2 Pokemon numero 2
+ * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
+ */
 const pokeNameCompare = (poke1, poke2) =>{
   return poke1.Name > poke2.Name;
 }
 
+/**
+ * Fonction pour comparer deux pokemons selon leur type
+ * pour faire le sort du array avec les pokemons
+ * @param {Etat} poke1 Pokemon numero 1
+ * @param {Etat} poke2 Pokemon numero 2
+ * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
+ */
 const pokeTypeCompare = (poke1, poke2)=>{
   return poke1.Types > poke2.Types;
 }
 
+/**
+ * Fonction pour comparer deux pokemons selon leurs abilities
+ * pour faire le sort du array avec les pokemons
+ * @param {Etat} poke1 Pokemon numero 1
+ * @param {Etat} poke2 Pokemon numero 2
+ * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
+ */
 const pokeAbilitiesCompare = (poke1, poke2)=>{
   return poke1.Abilities > poke2.Abilities;
 }
 
+/**
+ * Génère le code HTML du header de la card avec les details du pokemon (pokeCard)
+ * @param {Etat} pokemon le pokemon selon lequel produire la pokeCard
+ * @returns une string contenant le code html du header de pokeCard
+ */
 function generePokeCardHead(pokemon){
   return`
   <div class="column">
@@ -234,6 +332,11 @@ function generePokeCardHead(pokemon){
             <p>Hit points: ${pokemon.Hp}</p>`
 }
 
+/**
+ * Génère le code HTML du header modifie de la card avec les details du pokemon (pokeCard)
+ * @param {Etat} pokemon
+ * @returns une string contenant le code html du header de pokeCard
+ */
 function generePokeCardHeadChimbo(pokemon){
   return`
     <div class="card-header">
@@ -253,6 +356,11 @@ function generePokeCardHeadChimbo(pokemon){
             <p>Hit points: ${pokemon.Hp}</p>`
 }
 
+/**
+ * Génère le code HTML du corps de la card avec les details du pokemon (pokeCard)
+ * @param {Etat} pokemon
+ * @returns une string contenant le code html du corps de pokeCard
+ */
 function generePokeCardBody(pokemon){
   const abilt = generePokeAbilitiesCard(pokemon);
   const against = generePokeResistances(pokemon);
@@ -274,6 +382,11 @@ function generePokeCardBody(pokemon){
     <figure class="media-right">`
 }
 
+/**
+ * Génère le code HTML du footer de la card avec les details du pokemon (pokeCard)
+ * @param {Etat} pokemon
+ * @returns une string contenant le code html du footer de pokeCard
+ */
 function generePokeCardFoot(pokemon){
   return`
   <figure class="image is-475x475">
@@ -299,6 +412,11 @@ function generePokeCardFoot(pokemon){
   </div>`
 }
 
+/**
+ * Génère le code HTML de la card avec les details du pokemon (pokeCard)
+ * @param {Etat} pokemon
+ * @returns une string contenant le code html de pokeCard
+ */
 function generePokeCard(pokemon){
   console.log("se genero carta");
   const head = generePokeCardHead(pokemon);
@@ -307,6 +425,12 @@ function generePokeCard(pokemon){
   return head + body + foot;
 }
 
+/**
+ * Meme fonction q la precedente mais avec quelques lignes de moins
+ * pour faciliter l'insertion de la pokeCard
+ * @param {Etat} pokemon
+ * @returns une string contenant le code html de pokeCard
+ */
 function generePokeCardChimbo(pokemon){
   console.log("se genero carta");
   const head = generePokeCardHeadChimbo(pokemon);
