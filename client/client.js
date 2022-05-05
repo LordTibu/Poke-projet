@@ -139,6 +139,12 @@ function generePokemonHTML(pokemon){
   return name + abilt + types + `</tr>`;
 }
 
+function getvalsearch (){
+  if(document.getElementById("search") !== null){ 
+    return document.getElementById("search").value;
+  } else {return ""}
+}
+
 /**
  * Genere le code HTML du header de la liste de pokemons
  *  a afficher selon le etatCourant
@@ -197,9 +203,9 @@ function genereListeCallbacks(etatActuel){
     "pokeListeName" : {onclick : () => {
       if(etatActuel.click === "nameDESC"){
         console.log(`Clicked on pokeListeName`);
-        majEtatEtPage(etatActuel, {sort: pokeNumberCompareAsc, click :undefined})
+        majEtatEtPage(etatActuel, {sort: pokeNameCompareAsc, click :undefined})
       } else {
-        majEtatEtPage(etatActuel, {sort: pokeNumberCompareDesc, click : "nameDESC"})
+        majEtatEtPage(etatActuel, {sort: pokeNameCompareDesc, click : "nameDESC"})
       }
     }},
     "pokeListeAbilt" : {onclick : () => {
@@ -219,7 +225,12 @@ function genereListeCallbacks(etatActuel){
         console.log(`Clicked on pokeListeTypesDESC`);
         majEtatEtPage(etatActuel, {sort: pokeTypeCompareDesc, click : "typeDESC"})
       }
-    }}
+    }},
+    "search" : {
+      onchange: () => {
+          majEtatEtPage(etatActuel, {filter: filterName, sort: pokeNameCompareAsc, searchID : document.getElementById("search").value})
+      
+      }}
   };
 }
 
@@ -243,19 +254,21 @@ function generePokeListeFooter(etatCourant){
     callbacks : {"moreButton" : {onclick : () => {
       console.log("Clicked on more");
       document.getElementById("PokeListe").insertAdjacentHTML("beforeend",
-      etatCourant.pokemon.sort(etatCourant.sort).
+      etatCourant.pokemon.
+      filter(etatCourant.filter).
+      sort(etatCourant.sort).
       slice(etatCourant.seenPokemon, etatCourant.seenPokemon + 10).
       map(pokemon => generePokemonHTML(pokemon)).join("\n"));
       etatCourant.seenPokemon += 10;
       enregistreCallbacks(Object.assign({}, ...etatCourant.pokemon.
-        sort(etatCourant.sort).
+        filter(etatCourant.filter).sort(etatCourant.sort).
+        
         slice(0, etatCourant.seenPokemon).
         map( pokemon => generePokemonCallbacks(etatCourant, pokemon))))
       }
     }}
   }
 }
-
 
 /**
  * Genere le code HTML de la liste de pokemons (pokeListe) a afficher selon le etatCourant
@@ -266,10 +279,11 @@ function generePokeListeFooter(etatCourant){
  * et les callbacks dans le champs callbacks
  */
 function genereListePokemon(etatCourant){
-  const htmlArray = etatCourant.pokemon.sort(etatCourant.sort).
+  const htmlArray = etatCourant.pokemon.filter(etatCourant.filter).sort(etatCourant.sort).
   slice(0, etatCourant.seenPokemon).
   map(pokemon => generePokemonHTML(pokemon));
   const callb = Object.assign({}, ...etatCourant.pokemon.
+    filter(etatCourant.filter).
     sort(etatCourant.sort).
     slice(0, etatCourant.seenPokemon).
     map( pokemon => generePokemonCallbacks(etatCourant, pokemon)));
@@ -313,7 +327,7 @@ const pokeNumberCompareAsc =(poke1, poke2)=> {
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
 const pokeNameCompareAsc = (poke1, poke2) =>{
-  return poke1.Name > poke2.Name;
+  return poke1.Name.toLowerCase() > poke2.Name.toLowerCase();
 }
 
 /**
@@ -324,7 +338,7 @@ const pokeNameCompareAsc = (poke1, poke2) =>{
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
  const pokeNameCompareDesc = (poke1, poke2) =>{
-  return poke1.Name < poke2.Name;
+  return poke1.Name.toLowerCase() < poke2.Name.toLowerCase();
 }
 
 /**
@@ -335,7 +349,7 @@ const pokeNameCompareAsc = (poke1, poke2) =>{
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
 const pokeTypeCompareAsc = (poke1, poke2)=>{
-  return poke1.Types[0] <= poke2.Types[0];
+  return poke1.Types.toLowerCase() <= poke2.Types.toLowerCase();
 }
 
 /**
@@ -346,7 +360,7 @@ const pokeTypeCompareAsc = (poke1, poke2)=>{
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
  const pokeTypeCompareDesc = (poke1, poke2)=>{
-  return poke1.Types[0] >= poke2.Types[0];
+  return poke1.Types.toLowerCase() >= poke2.Types.toLowerCase();
 }
 
 /**
@@ -357,7 +371,7 @@ const pokeTypeCompareAsc = (poke1, poke2)=>{
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
  const pokeAbilitiesCompareAsc = (poke1, poke2)=>{
-  return poke1.Abilities > poke2.Abilities;
+  return poke1.Abilities.toLowerCase() >= poke2.Abilities.toLowerCase();
 }
 
 /**
@@ -368,8 +382,23 @@ const pokeTypeCompareAsc = (poke1, poke2)=>{
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
 const pokeAbilitiesCompareDesc = (poke1, poke2)=>{
-  return poke1.Abilities < poke2.Abilities;
+  return poke1.Abilities.toLowerCase() <= poke2.Abilities.toLowerCase();
 }
+
+/**
+ * Fonction pour comparer deux pokemons selon leurs abilities
+ * pour faire le sort du array avec les pokemons
+ * @param {Etat} poke1 Pokemon numero 1
+ * @param {Etat} poke2 Pokemon numero 2
+ * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
+ */
+ const filterName = (poke1)=>{
+   if(document.getElementById("search") !== null){ 
+   document.getElementById("search").value = document.getElementById("search").value;
+  return poke1.Name.toLowerCase().indexOf(document.getElementById("search").value.toLowerCase()) >= 0;
+   }
+}
+
 
 /**
  * Génère le code HTML du header de la card avec les details du pokemon (pokeCard)
@@ -693,6 +722,7 @@ function genereBarreNavigation(etatCourant) {
     <div class="navbar">
       <div class="navbar-item">
         <div class="buttons">
+          <input type="text" id="search" placeholder="Search for pokemon.." value=${etatCourant.searchID}>
             <a id="btn-pokedex" class="button is-light"> Pokedex </a>
             <a id="btn-combat" class="button is-light"> Combat </a>
         </div>
@@ -822,8 +852,10 @@ function initClientPokemons() {
       pokemon : pokeArray,
       selectedPokemon: pokeArray[18],
       sort: pokeNumberCompareAsc,
+      filter : filterName,
       seenPokemon : 10,
-      click : undefined
+      click : undefined,
+      searchID: ""
     })
   })
 }
