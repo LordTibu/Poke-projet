@@ -262,7 +262,6 @@ function generePokeListeFooter(etatCourant){
       etatCourant.seenPokemon += 10;
       enregistreCallbacks(Object.assign({}, ...etatCourant.pokemon.
         filter(etatCourant.filter).sort(etatCourant.sort).
-        
         slice(0, etatCourant.seenPokemon).
         map( pokemon => generePokemonCallbacks(etatCourant, pokemon))))
       }
@@ -279,7 +278,8 @@ function generePokeListeFooter(etatCourant){
  * et les callbacks dans le champs callbacks
  */
 function genereListePokemon(etatCourant){
-  const htmlArray = etatCourant.pokemon.filter(etatCourant.filter).sort(etatCourant.sort).
+  const htmlArray = etatCourant.pokemon.filter(etatCourant.filter).
+  sort(etatCourant.sort).
   slice(0, etatCourant.seenPokemon).
   map(pokemon => generePokemonHTML(pokemon));
   const callb = Object.assign({}, ...etatCourant.pokemon.
@@ -287,10 +287,11 @@ function genereListePokemon(etatCourant){
     sort(etatCourant.sort).
     slice(0, etatCourant.seenPokemon).
     map( pokemon => generePokemonCallbacks(etatCourant, pokemon)));
-    console.log(callb);
+  console.log(callb);
   const callb2 = genereListeCallbacks(etatCourant);
   return {html:generePokeListeHead() + htmlArray.join("\n") +
-  generePokeListeFooter(etatCourant).html + generePokeCard(etatCourant.selectedPokemon) +
+  generePokeListeFooter(etatCourant).html + 
+  generePokeCard(etatCourant.selectedPokemon) +
   `</div>
   </div>
   </section>`,
@@ -327,7 +328,7 @@ const pokeNumberCompareAsc =(poke1, poke2)=> {
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
 const pokeNameCompareAsc = (poke1, poke2) =>{
-  return poke1.Name.toLowerCase() > poke2.Name.toLowerCase();
+  return poke1.Name > poke2.Name;
 }
 
 /**
@@ -338,7 +339,7 @@ const pokeNameCompareAsc = (poke1, poke2) =>{
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
  const pokeNameCompareDesc = (poke1, poke2) =>{
-  return poke1.Name.toLowerCase() < poke2.Name.toLowerCase();
+  return poke1.Name < poke2.Name;
 }
 
 /**
@@ -349,7 +350,7 @@ const pokeNameCompareAsc = (poke1, poke2) =>{
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
 const pokeTypeCompareAsc = (poke1, poke2)=>{
-  return poke1.Types.toLowerCase() <= poke2.Types.toLowerCase();
+  return poke1.Types < poke2.Types;
 }
 
 /**
@@ -360,7 +361,7 @@ const pokeTypeCompareAsc = (poke1, poke2)=>{
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
  const pokeTypeCompareDesc = (poke1, poke2)=>{
-  return poke1.Types.toLowerCase() >= poke2.Types.toLowerCase();
+  return poke1.Types > poke2.Types;
 }
 
 /**
@@ -371,7 +372,7 @@ const pokeTypeCompareAsc = (poke1, poke2)=>{
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
  const pokeAbilitiesCompareAsc = (poke1, poke2)=>{
-  return poke1.Abilities.toLowerCase() >= poke2.Abilities.toLowerCase();
+  return poke1.Abilities > poke2.Abilities;
 }
 
 /**
@@ -382,7 +383,7 @@ const pokeTypeCompareAsc = (poke1, poke2)=>{
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
 const pokeAbilitiesCompareDesc = (poke1, poke2)=>{
-  return poke1.Abilities.toLowerCase() <= poke2.Abilities.toLowerCase();
+  return poke1.Abilities < poke2.Abilities;
 }
 
 /**
@@ -392,11 +393,12 @@ const pokeAbilitiesCompareDesc = (poke1, poke2)=>{
  * @param {Etat} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
- const filterName = (poke1)=>{
-   if(document.getElementById("search") !== null){ 
-   document.getElementById("search").value = document.getElementById("search").value;
+ const filterName = (poke1) => {
+  if(document.getElementById("search") !== null){ 
+  document.getElementById("search").value = document.getElementById("search").value;
   return poke1.Name.toLowerCase().indexOf(document.getElementById("search").value.toLowerCase()) >= 0;
-   }
+  }
+  return true;
 }
 
 
