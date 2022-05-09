@@ -30,6 +30,46 @@ function fetchWhoami(keyapi) {
   }
 }
 
+// Get deck from server
+function getDeck(etatCourant){
+  if(etatCourant.login !== undefined){
+    return fetch(serverUrl + "/deck/" + etatCourant.login, { 
+      headers: { "Api-Key": etatCourant.apiKey } 
+    }).then((req) => {
+      if (req.status === 200) {
+        return req.json();
+      } else if (req.status === 401) {
+        return Promise.reject("Unknown key, unauthorized");
+      } else {
+        return Promise.reject("Unexpected status :" + req.status);
+      }
+    });
+  }else {
+    return Promise.reject("API key not set");
+  }
+}
+
+// Post deck from server
+function addDeck(etatCourant, content){
+  if(etatCourant.login !== undefined){
+    return fetch(serverUrl + "/deck", {
+      headers: {"Api-Key": etatCourant.apiKey , "Content-Type" : "application/json" },
+      body: JSON.stringify(content),
+      method: "POST"
+    }).then((req) => {
+      if (req.status === 200) {
+        return req.json();
+      } else if (req.status === 401) {
+        return Promise.reject("Unknown key, unauthorized");
+      } else {
+        return Promise.reject("Unexpected status :" + req.status);
+      }
+    });
+  }else {
+    return Promise.reject("API key not set");
+  }
+}
+
 // Get all pokemons from server
 const fetchPokemon = () => {
   return fetch(serverUrl + "/pokemon").then((response) => {return response.json()});
@@ -73,8 +113,13 @@ function generePokemonCallbacks(etatActuel, pokemon){
     document.getElementById(pokemon.Name).classList.toggle("is-selected");
     etatActuel.selectedPokemon = pokemon;
     document.getElementById("PokeCard").innerHTML = generePokeCardChimbo(pokemon);
-    }
-  }};
+    enregistreCallbacks({"addindeck": {onclick : () => {
+      console.log("add " + pokemon.PokedexNumber);
+      etatActuel.deckadd.push(pokemon.PokedexNumber);
+      addDeck(etatActuel, etatActuel.deckadd);
+    }}});
+    }}
+  };
 }
 
 /**
@@ -227,10 +272,17 @@ function genereListeCallbacks(etatActuel){
       }
     }},
     "search" : {
-      onchange: () => {
+      oninput: () => {
           majEtatEtPage(etatActuel, {filter: filterName, sort: pokeNameCompareAsc, searchID : document.getElementById("search").value})
       
-      }}
+      }},
+      "tab-tout" : {
+        onclick: () => {
+            getDeck(etatActuel).then(pokemons => {
+                majEtatEtPage(etatActuel, { deckadd: pokemons });
+              });
+            console.log(etatActuel.deckadd);
+        }}
   };
 }
 
@@ -497,11 +549,9 @@ function generePokeCardFoot(pokemon){
     </div>
     <div class="card-footer">
       <article class="media">
-        <div class="media-content">
-          <button class="is-success button" tabindex="0">
+          <a id="addindeck" class="is-success button" >
             Ajouter à mon deck
-          </button>
-        </div>
+          </a>
       </article>
     </div>
   </div>
@@ -548,6 +598,7 @@ function lanceWhoamiEtInsereLogin(etatCourant,keyapi) {
       login: data.user, // qui vaut undefined en cas d'erreur
       errLogin: data.err, // qui vaut undefined si tout va bien
       loginModal: true, // on affiche la modale
+      apiKey: keyapi,
     });
   });
 }
@@ -857,6 +908,7 @@ function initClientPokemons() {
       filter : filterName,
       seenPokemon : 10,
       click : undefined,
+      deckadd: [],
       searchID: ""
     })
   })
