@@ -1,16 +1,14 @@
 /* ******************************************************************
  * Constantes de configuration
  * ****************************************************************** */
-//const apiKey = "bafae61a-54b5-4977-94d4-d8159bec8262";
 const serverUrl = "https://lifap5.univ-lyon1.fr";
-//const allPokemon = fetch(serverUrl + "/pokemon").then((response) => {return response.json()});
-
 /* ******************************************************************
  * Gestion de la boîte de dialogue (a.k.a. modal) d'affichage de
  * l'utilisateur.
  * ****************************************************************** */
 /**
  * Fait une requête GET authentifiée sur /whoami
+ * @param {string} keyapi la clé api
  * @returns une promesse du login utilisateur ou du message d'erreur
  */
 function fetchWhoami(keyapi) {
@@ -30,7 +28,11 @@ function fetchWhoami(keyapi) {
   }
 }
 
-// Get deck from server
+/**
+ * Fait une requête GET authentifiée sur /deck/:id
+ * @param {Etat} etatCourant l'état courant
+ * @returns promesse d'un array avec les ids dans le deck de l'utilisateurs ou du message d'erreur
+ */
 function getDeck(etatCourant){
   if(etatCourant.login !== undefined){
     return fetch(serverUrl + "/deck/" + etatCourant.login, { 
@@ -49,7 +51,12 @@ function getDeck(etatCourant){
   }
 }
 
-// Post deck from server
+/**
+ * Fait une requête POST authentifiée sur /deck
+ * @param {Etat} etatCourant l'état courant
+ * @param {object} content tableau int des ids
+ * @returns promesse d'un array avec les ids dans le deck de l'utilisateurs ou du message d'erreur
+ */
 function addDeck(etatCourant, content){
   if(etatCourant.login !== undefined){
     return fetch(serverUrl + "/deck", {
@@ -70,18 +77,27 @@ function addDeck(etatCourant, content){
   }
 }
 
-// Get all pokemons from server
+/**
+ * Fait une requête GET sur /pokemon
+ * @returns promesse d'un tableau contenant les pokemons connus par le serveur avec des détails sur chaque pokemon.
+ */
 const fetchPokemon = () => {
   return fetch(serverUrl + "/pokemon").then((response) => {return response.json()});
 }
 
-// Funcion ejemplo de como iterar a traves del tab de pokemones
+/**
+ * Iteration a travers la table des pokemons
+ */
 function iterateAllPokemon(){
   fetchPokemon().then((pokeArray) => {
     pokeArray.forEach(pokemon => {console.log(pokemon.PokedexNumber);})
   })
 }
-
+/**
+ * Génère le code HTML d'une partie de la table
+ * @param {object} pokemon 
+ * @returns le code HTML 
+ */
 function generePokeName(pokemon){
     return`
     <tr id="${pokemon.Name}" class="">
@@ -97,11 +113,10 @@ function generePokeName(pokemon){
 }
 
 /**
- * Genere une callback de la pokeListe dependant du pokemon (utile pour faire 
- * un map dans un array de pokemon)
- * @param {Etat} pokemon pokemon selon lequel faire la callback
- * @returns un objet contenant le callback dependant du pokemon et l'etat
- * Actuel
+ * Genere une callback de la pokeListe dependant du pokemon 
+ * @param {Etat} etatActuel l'etat actuel
+ * @param {object} pokemon pokemon selon lequel faire la callback
+ * @returns un objet contenant le callback dependant du pokemon 
  */
 function generePokemonCallbacks(etatActuel, pokemon){
   return {[pokemon.Name] : {onclick : () => {
@@ -125,7 +140,7 @@ function generePokemonCallbacks(etatActuel, pokemon){
 /**
  * Genere le code HTML des abilities d'un pokemon, utilisé
  * pour afficher le pokemon dans la pokeListe
- * @param {Etat} pokemon pokemon selon lequel faire le HTML
+ * @param {object} pokemon pokemon selon lequel faire le HTML
  * @returns une string contenant le code HTML
  */
 function generePokeAbilities(pokemon){
@@ -135,7 +150,7 @@ function generePokeAbilities(pokemon){
 
 /**
  * Genere le code HTML des types d'un pokemon
- * @param {Etat} pokemon pokemon selon lequel faire le HTML
+ * @param {object} pokemon pokemon selon lequel faire le HTML
  * @returns une string contenant le code HTML
  */
 function generePokeTypes(pokemon){
@@ -146,7 +161,7 @@ function generePokeTypes(pokemon){
 /**
  * Genere le code HTML des abilities d'un pokemon, utilisé
  * pour afficher la pokeCard (cf. "generePokeCard")
- * @param {Etat} pokemon pokemon selon lequel le HTML
+ * @param {object} pokemon pokemon selon lequel le HTML
  * @returns une string contenant le code HTML
  */
 function generePokeAbilitiesCard(pokemon){
@@ -157,7 +172,7 @@ function generePokeAbilitiesCard(pokemon){
 /**
  * Genere le code HTML des resistances d'un pokemon, utilisé
  * pour afficher la pokeCard (cf. "generePokeCard")
- * @param {Etat} pokemon pokemon selon lequel faire les resistances
+ * @param {object} pokemon pokemon selon lequel faire les resistances
  * @returns un objet contenant le code HTML des resistances d'un poke
  * dans le champ strong et weak dependant de la valeur de la resistance
  */
@@ -173,7 +188,7 @@ function generePokeResistances(pokemon){
 
 /**
  * genere le code HTML de l'entree de la liste pokedex (pokeListe) d'un pokemon
- * @param {Etat} pokemon pokemon selon lequel genere le code HTML
+ * @param {object} pokemon pokemon selon lequel genere le code HTML
  * @returns une string contenant le code HTML de l'entree du pokemon dans la liste
  * pokedex
  */
@@ -184,6 +199,10 @@ function generePokemonHTML(pokemon){
   return name + abilt + types + `</tr>`;
 }
 
+/**
+ * recupere la valeur de l'input search
+ * @returns une string contenant la valeur ecrit dans search ou "" 
+ */
 function getvalsearch (){
   if(document.getElementById("search") !== null){ 
     return document.getElementById("search").value;
@@ -227,6 +246,11 @@ function generePokeListeHead(){
             <tbody id="PokeListe">`
 }
 
+/**
+ * Genere une liste de callbacks qui correspond a chaque bouton  
+ * @param {Etat} etatActuel l'etat actuel
+ * @returns un objet contenant les callbacks 
+ */
 function genereListeCallbacks(etatActuel){
   return {
     "tab-tout" : {onclick : () => {
@@ -353,8 +377,8 @@ function genereListePokemon(etatCourant){
 /**
  * Fonction pour comparer deux pokemons selon le numero dans la pokedex
  * pour faire le sort du array avec les pokemons
- * @param {Etat} poke1 Pokemon numero 1
- * @param {Etat} poke2 Pokemon numero 2
+ * @param {object} poke1 Pokemon numero 1
+ * @param {object} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
  const pokeNumberCompareDesc =(poke1, poke2)=> {
@@ -364,8 +388,8 @@ function genereListePokemon(etatCourant){
 /**
  * Fonction pour comparer deux pokemons selon le numero dans la pokedex
  * pour faire le sort du array avec les pokemons
- * @param {Etat} poke1 Pokemon numero 1
- * @param {Etat} poke2 Pokemon numero 2
+ * @param {object} poke1 Pokemon numero 1
+ * @param {object} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
 const pokeNumberCompareAsc =(poke1, poke2)=> {
@@ -375,8 +399,8 @@ const pokeNumberCompareAsc =(poke1, poke2)=> {
 /**
  * Fonction pour comparer deux pokemons selon leur nom
  * pour faire le sort du array avec les pokemons
- * @param {Etat} poke1 Pokemon numero 1
- * @param {Etat} poke2 Pokemon numero 2
+ * @param {object} poke1 Pokemon numero 1
+ * @param {object} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
 const pokeNameCompareAsc = (poke1, poke2) =>{
@@ -386,8 +410,8 @@ const pokeNameCompareAsc = (poke1, poke2) =>{
 /**
  * Fonction pour comparer deux pokemons selon leur nom
  * pour faire le sort du array avec les pokemons
- * @param {Etat} poke1 Pokemon numero 1
- * @param {Etat} poke2 Pokemon numero 2
+ * @param {object} poke1 Pokemon numero 1
+ * @param {object} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
  const pokeNameCompareDesc = (poke1, poke2) =>{
@@ -397,8 +421,8 @@ const pokeNameCompareAsc = (poke1, poke2) =>{
 /**
  * Fonction pour comparer deux pokemons selon leur type
  * pour faire le sort du array avec les pokemons
- * @param {Etat} poke1 Pokemon numero 1
- * @param {Etat} poke2 Pokemon numero 2
+ * @param {object} poke1 Pokemon numero 1
+ * @param {object} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
 const pokeTypeCompareAsc = (poke1, poke2)=>{
@@ -408,8 +432,8 @@ const pokeTypeCompareAsc = (poke1, poke2)=>{
 /**
  * Fonction pour comparer deux pokemons selon leur type
  * pour faire le sort du array avec les pokemons
- * @param {Etat} poke1 Pokemon numero 1
- * @param {Etat} poke2 Pokemon numero 2
+ * @param {object} poke1 Pokemon numero 1
+ * @param {object} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
  const pokeTypeCompareDesc = (poke1, poke2)=>{
@@ -419,8 +443,8 @@ const pokeTypeCompareAsc = (poke1, poke2)=>{
 /**
  * Fonction pour comparer deux pokemons selon leurs abilities
  * pour faire le sort du array avec les pokemons
- * @param {Etat} poke1 Pokemon numero 1
- * @param {Etat} poke2 Pokemon numero 2
+ * @param {object} poke1 Pokemon numero 1
+ * @param {object} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
  const pokeAbilitiesCompareAsc = (poke1, poke2)=>{
@@ -430,8 +454,8 @@ const pokeTypeCompareAsc = (poke1, poke2)=>{
 /**
  * Fonction pour comparer deux pokemons selon leurs abilities
  * pour faire le sort du array avec les pokemons
- * @param {Etat} poke1 Pokemon numero 1
- * @param {Etat} poke2 Pokemon numero 2
+ * @param {object} poke1 Pokemon numero 1
+ * @param {object} poke2 Pokemon numero 2
  * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
  */
 const pokeAbilitiesCompareDesc = (poke1, poke2)=>{
@@ -439,11 +463,10 @@ const pokeAbilitiesCompareDesc = (poke1, poke2)=>{
 }
 
 /**
- * Fonction pour comparer deux pokemons selon leurs abilities
- * pour faire le sort du array avec les pokemons
- * @param {Etat} poke1 Pokemon numero 1
- * @param {Etat} poke2 Pokemon numero 2
- * @returns -1, 0, 1 dependant de quel pokemon est "superieur" 
+ * Fonction pour comparer un le nom d'un pokemon par rapport 
+ * a la valeur de l'input search
+ * @param {object} poke1 Pokemon 
+ * @returns -1, 1 dependant si le nom comporte le input de search
  */
  const filterName = (poke1) => {
   if(document.getElementById("search") !== null){ 
@@ -456,7 +479,7 @@ const pokeAbilitiesCompareDesc = (poke1, poke2)=>{
 
 /**
  * Génère le code HTML du header de la card avec les details du pokemon (pokeCard)
- * @param {Etat} pokemon le pokemon selon lequel produire la pokeCard
+ * @param {object} pokemon le pokemon selon lequel produire la pokeCard
  * @returns une string contenant le code html du header de pokeCard
  */
 function generePokeCardHead(pokemon){
@@ -482,7 +505,7 @@ function generePokeCardHead(pokemon){
 
 /**
  * Génère le code HTML du header modifie de la card avec les details du pokemon (pokeCard)
- * @param {Etat} pokemon
+ * @param {object} pokemon
  * @returns une string contenant le code html du header de pokeCard
  */
 function generePokeCardHeadChimbo(pokemon){
@@ -506,7 +529,7 @@ function generePokeCardHeadChimbo(pokemon){
 
 /**
  * Génère le code HTML du corps de la card avec les details du pokemon (pokeCard)
- * @param {Etat} pokemon
+ * @param {object} pokemon
  * @returns une string contenant le code html du corps de pokeCard
  */
 function generePokeCardBody(pokemon){
@@ -532,7 +555,7 @@ function generePokeCardBody(pokemon){
 
 /**
  * Génère le code HTML du footer de la card avec les details du pokemon (pokeCard)
- * @param {Etat} pokemon
+ * @param {object} pokemon
  * @returns une string contenant le code html du footer de pokeCard
  */
 function generePokeCardFoot(pokemon){
@@ -560,11 +583,11 @@ function generePokeCardFoot(pokemon){
 
 /**
  * Génère le code HTML de la card avec les details du pokemon (pokeCard)
- * @param {Etat} pokemon
+ * @param {object} pokemon
  * @returns une string contenant le code html de pokeCard
  */
 function generePokeCard(pokemon){
-  console.log("se genero carta");
+  console.log("Card generated");
   const head = generePokeCardHead(pokemon);
   const body = generePokeCardBody(pokemon);
   const foot = generePokeCardFoot(pokemon);
@@ -574,11 +597,11 @@ function generePokeCard(pokemon){
 /**
  * Meme fonction q la precedente mais avec quelques lignes de moins
  * pour faciliter l'insertion de la pokeCard
- * @param {Etat} pokemon
+ * @param {object} pokemon
  * @returns une string contenant le code html de pokeCard
  */
 function generePokeCardChimbo(pokemon){
-  console.log("se genero carta");
+  console.log("Card generated");
   const head = generePokeCardHeadChimbo(pokemon);
   const body = generePokeCardBody(pokemon);
   const foot = generePokeCardFoot(pokemon);
@@ -589,7 +612,8 @@ function generePokeCardChimbo(pokemon){
  * Fait une requête sur le serveur et insère le login dans la modale d'affichage
  * de l'utilisateur puis déclenche l'affichage de cette modale.
  *
- * @param {Etat} etatCourant l'état courant
+ * @param {object} etatCourant l'état courant
+ * @param {string} keyapi clé api
  * @returns Une promesse de mise à jour
  */
 function lanceWhoamiEtInsereLogin(etatCourant,keyapi) {
@@ -605,11 +629,10 @@ function lanceWhoamiEtInsereLogin(etatCourant,keyapi) {
 
 /**
  * Génère le code HTML du corps de la modale de login. On renvoie en plus un
- * objet callbacks vide pour faire comme les autres fonctions de génération,
- * mais ce n'est pas obligatoire ici.
+ * objet callbacks 
  * @param {Etat} etatCourant
- * @returns un objet contenant le code HTML dans le champ html et un objet vide
- * dans le champ callbacks
+ * @returns un objet contenant le code HTML dans le champ html et les callbacks
+ * pour le login
  */
 function genereModaleLoginBody(etatCourant) {
   const html = `
@@ -637,7 +660,6 @@ function genereModaleLoginBody(etatCourant) {
 
 /**
  * Génère le code HTML du titre de la modale de login et les callbacks associés.
- *
  * @param {Etat} etatCourant
  * @returns un objet contenant le code HTML dans le champ html et la description
  * des callbacks à enregistrer dans le champ callbacks
@@ -662,7 +684,6 @@ function genereModaleLoginHeader(etatCourant) {
 }
 /**
  * Génère le code HTML du base de page de la modale de login et les callbacks associés.
- *
  * @param {Etat} etatCourant
  * @returns un objet contenant le code HTML dans le champ html et la description
  * des callbacks à enregistrer dans le champ callbacks
@@ -686,7 +707,6 @@ function genereModaleLoginFooter(etatCourant) {
 
 /**
  * Génère le code HTML de la modale de login et les callbacks associés.
- *
  * @param {Etat} etatCourant
  * @returns un objet contenant le code HTML dans le champ html et la description
  * des callbacks à enregistrer dans le champ callbacks
@@ -710,15 +730,11 @@ function genereModaleLogin(etatCourant) {
   };
 }
 
-/* ************************************************************************
- * Gestion de barre de navigation contenant en particulier les bouton Pokedex,
- * Combat et Connexion.
- * ****************************************************************** */
-
 /**
  * Déclenche la mise à jour de la page en changeant l'état courant pour que la
  * modale de login soit affichée
- * @param {Etat} etatCourant
+ * @param {Etat} etatCourant l'etat courant
+ * @param {string} keyapi clé api
  */
 function afficheModaleConnexion(etatCourant,keyapi) {
   lanceWhoamiEtInsereLogin(etatCourant,keyapi);
@@ -828,6 +844,7 @@ function generePage(etatCourant) {
  * globale de la page.
  * ****************************************************************** */
 
+
 /**
  * Créée un nouvel état basé sur les champs de l'ancien état, mais en prenant en
  * compte les nouvelles valeurs indiquées dans champsMisAJour, puis déclenche la
@@ -914,7 +931,9 @@ function initClientPokemons() {
   })
 }
 
-// Appel de la fonction init_client_duels au après chargement de la page
+/** 
+ * Appel de la fonction init_client_duels au après chargement de la page
+ */
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Exécution du code après chargement de la page");
   //iterateAllPokemon();
